@@ -23,6 +23,11 @@ GitHub Pages. Домен: **offers.asg-hub.com** (см. `CNAME`).
   структуры и относительных путей пакета**, коммитить и пушить.
 - Если это архив (zip) — распаковать и перенести всё дерево файлов целиком,
   не выборочно.
+- Если в `index.html` встречается плейсхолдер `{{OFFER_URL}}` (используется
+  в тегах Open Graph для превью ссылок в мессенджерах) — **не трогать его и
+  не подставлять вручную**. Его заполняет автоматически workflow
+  `.github/workflows/offer-link-previews.yml` после пуша, коммитом
+  «Bake offer link-preview URLs».
 
 ## Структура репозитория
 
@@ -96,3 +101,14 @@ offer.js, brand-interaction.css, asg-transport.js, data/offer.js).
 Опубликован пример на основе этого шаблона (Ferrari 296 Speciale) —
 `/o/f9oqdj/`. Данные внутри `data/offer.js` (`window.ASG_OFFERS["ferrari-296-speciale"]`)
 не менялись, это пример/демо-контент из присланного пакета.
+
+Правило самодостаточности папок офферов (дублирование css/js/шрифтов/ассетов
+в каждом `/o/<slug>/`, без общих путей и симлинков) — подтверждено
+пользователем, задокументировано выше.
+
+Добавлен `.github/workflows/offer-link-previews.yml`: на каждый пуш,
+затрагивающий `o/**/index.html`, ищет `{{OFFER_URL}}` и подставляет
+`https://offers.asg-hub.com/o/<slug>` по имени папки, коммитит результат сам
+(«Bake offer link-preview URLs»). Репозиторий деплоится через классический
+branch-based GitHub Pages (не через Actions Pages pipeline) — конфликтов нет.
+Агенту руками `{{OFFER_URL}}` не трогать.
