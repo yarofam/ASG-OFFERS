@@ -881,6 +881,7 @@
       if (epoch !== state.enquiryEpoch) return;
       if (result?.accepted !== true || typeof result.reference !== "string" || !result.reference.trim()) throw new Error("NOT_ACKNOWLEDGED");
       setText("enquiryStatus", "Your enquiry has been received by the ASG team. Reference: " + result.reference + ".");
+      showEnquirySuccess(result.reference);
     } catch {
       if (epoch === state.enquiryEpoch) setText("enquiryStatus", "We could not confirm receipt. Your entries are still here. Please try again.");
     } finally {
@@ -906,6 +907,30 @@
       stepLightbox(event.key === "ArrowLeft" ? -1 : 1);
     }
   });
+  // A receipt replaces the form: the reader must see acknowledgement, not read a status line.
+  function showEnquirySuccess(reference) {
+    setText("enquirySuccessRef", reference);
+    requestPanel.dataset.enquiryState = "sent";
+    $(".request-panel__intro").hidden = true;
+    form.hidden = true;
+    byId("enquirySuccess").hidden = false;
+    $(".request-panel__body").scrollTop = 0;
+    byId("enquirySuccessTitle").focus({ preventScroll: true });
+  }
+  function resetEnquiryPanel() {
+    if (requestPanel.dataset.enquiryState !== "sent") return;
+    delete requestPanel.dataset.enquiryState;
+    byId("enquirySuccess").hidden = true;
+    form.hidden = false;
+    $(".request-panel__intro").hidden = false;
+    form.reset();
+    // A sent enquiry must never be resubmitted from stale keys or a carried-over fingerprint.
+    state.enquiryFingerprint = null;
+    state.idempotencyKey = null;
+    state.enquiryContext = null;
+    updateTopic();
+  }
+  byId("enquirySuccessClose").addEventListener("click", () => requestPanel.close());
   function openRequest(button, topic) {
     state.requestTrigger = button;
     syncEnquiryRecipient();
@@ -923,6 +948,7 @@
   $(".request-panel__close").addEventListener("click", () => requestPanel.close());
   requestPanel.addEventListener("close", () => {
     document.body.classList.remove("is-modal");
+    resetEnquiryPanel();
     if (state.requestTrigger?.isConnected) state.requestTrigger.focus({ preventScroll: true });
   });
 

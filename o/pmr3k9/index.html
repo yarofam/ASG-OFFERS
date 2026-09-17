@@ -5,8 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0b0d0e">
   <meta name="color-scheme" content="light dark">
-  <title>ASG Private Offer</title>
-  <link rel="icon" href="data:,">
+  <title>Ferrari 296 Speciale — ASG Private Offer</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <!-- Link preview (WhatsApp/Telegram/iMessage). Crawlers do not run JS, so {{OFFER_URL}} is
+       filled from the deploy folder name by .github/workflows/offer-link-previews.yml. Leave it. -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="ASG — Automotive Supply Group">
+  <meta property="og:title" content="Ferrari 296 Speciale — ASG Private Offer">
+  <meta property="og:description" content="A private, non-binding vehicle offer prepared by the ASG team.">
+  <meta property="og:url" content="{{OFFER_URL}}/">
+  <meta property="og:image" content="{{OFFER_URL}}/share.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="offer.css">
 <meta name="robots" content="noindex, noarchive"><meta name="referrer" content="no-referrer"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src https://api.web3forms.com; form-action 'none'; base-uri 'none'; frame-src 'self'"><link rel="stylesheet" href="brand-interaction.css"></head>
 <body>
@@ -238,6 +250,13 @@
       <input class="request-form__trap" id="enquiryBotcheck" type="checkbox" name="botcheck" tabindex="-1" aria-hidden="true" autocomplete="off">
       <div class="request-form__footer"><p id="enquiryStatus" role="status" aria-live="polite" aria-atomic="true">Complete the form and select Send enquiry.</p><button class="button button--primary" id="enquirySubmit" type="submit">Send enquiry <span aria-hidden="true">↗</span></button></div>
     </form>
+    <div class="enquiry-success" id="enquirySuccess" role="status" hidden>
+      <div class="enquiry-success__mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9.5 18 20 6.5"></path></svg></div>
+      <h3 id="enquirySuccessTitle" tabindex="-1">Your enquiry is with the ASG team.</h3>
+      <p class="enquiry-success__body" id="enquirySuccessBody">We have your details and will reply through the channel you chose. Keep the reference below if you need to follow up.</p>
+      <dl class="enquiry-success__ref"><dt>Reference</dt><dd class="asg-data" id="enquirySuccessRef"></dd></dl>
+      <button class="button button--primary" id="enquirySuccessClose" type="button">Close</button>
+    </div>
     </div>
   </dialog>
 
