@@ -1,0 +1,43 @@
+name: Bake offer link previews
+
+# Messengers read og:image from the served HTML and need an absolute URL, which is
+# only known once the offer folder has a name. This fills it in from that name, so
+# publishing stays a plain copy of the offer folder into o/<anything>/.
+
+on:
+  push:
+    paths: [ "o/**/index.html" ]
+
+permissions:
+  contents: write
+
+jobs:
+  bake:
+    runs-on: ubuntu-latest
+    env:
+      BASE_URL: https://offers.asg-hub.com
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fill {{OFFER_URL}} from each offer folder name
+        run: |
+          set -e
+          changed=0
+          for file in o/*/index.html; do
+            [ -e "$file" ] || continue
+            grep -q '{{OFFER_URL}}' "$file" || continue
+            slug="$(basename "$(dirname "$file")")"
+            sed -i "s#{{OFFER_URL}}#${BASE_URL}/o/${slug}#g" "$file"
+            echo "baked $file -> ${BASE_URL}/o/${slug}"
+            changed=1
+          done
+          echo "changed=$changed" >> "$GITHUB_ENV"
+
+      - name: Commit the filled URLs
+        if: env.changed == '1'
+        run: |
+          git config user.name "asg-offers-bot"
+          git config user.email "bot@asg-hub.com"
+          git add o/*/index.html
+          git commit -m "Bake offer link-preview URLs"
+          git push
