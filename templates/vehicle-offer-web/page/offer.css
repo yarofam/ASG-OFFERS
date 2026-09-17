@@ -26,7 +26,10 @@
   --danger: #a93830;
   --page: clamp(20px, 5.55vw, 80px);
   --gap: clamp(16px, 1.66vw, 24px);
-  --content: 1280px;
+  /* Overview, the fact grid and the model note used to cap at 1280px while every
+     numbered section ran the full padded width — above ~1440px they read as
+     narrower than the rest of the page. One width for all of them. */
+  --content: 100%;
   --hairline-dark: rgba(17, 19, 21, 0.16);
   --hairline-light: rgba(242, 240, 235, 0.18);
   --shadow: 0 30px 80px rgba(17, 19, 21, 0.14);
