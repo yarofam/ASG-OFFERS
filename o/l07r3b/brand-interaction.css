@@ -1,0 +1,26 @@
+/* Original master geometry, including descriptor. Only its orange path reacts. */
+.topbar__brand .brand-lockup, .footer__brand .brand-lockup { display: block; width: 100%; height: auto; overflow: visible; }
+@media screen {
+  .brand-lockup path[fill="#F15A24"] { transition: filter 180ms ease; }
+  @media (any-hover: hover) {
+    html:not([data-brand-pointer="touch"]):not([data-brand-pointer="pen"]) :is(.topbar__brand,.footer__brand):hover .brand-lockup path[fill="#F15A24"] {
+      filter: brightness(1.4) drop-shadow(0 0 4px #f15a24);
+    }
+  }
+  :is(.topbar__brand,.footer__brand):focus-visible { outline: 3px solid #ffaf89; outline-offset: 4px; }
+  .topbar__brand.is-signal-pulsing .brand-lockup path[fill="#F15A24"] { animation: asg-signal-tap-a 800ms ease-out 1; }
+  .topbar__brand.is-signal-pulsing[data-signal-cycle="0"] .brand-lockup path[fill="#F15A24"] { animation-name: asg-signal-tap-b; }
+  /* Two identical names allow a repeated tap to restart one cycle, without layout reads. */
+  @keyframes asg-signal-tap-a {
+    0%,100% { filter: none; }
+    12.5%,43.75% { filter: brightness(1.28) drop-shadow(0 0 3px #f15a24); }
+  }
+  @keyframes asg-signal-tap-b {
+    0%,100% { filter: none; }
+    12.5%,43.75% { filter: brightness(1.28) drop-shadow(0 0 3px #f15a24); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .brand-lockup path[fill="#F15A24"] { transition: none; animation: none !important; }
+    .topbar__brand.is-signal-pulsing .brand-lockup path[fill="#F15A24"] { filter: brightness(1.28) drop-shadow(0 0 3px #f15a24); }
+  }
+}
