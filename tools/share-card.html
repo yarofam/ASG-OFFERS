@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ASG catalogue link preview</title>
+<style>
+  @font-face { font-family:"Onest"; src:url("../assets/Onest.ttf") format("truetype"); font-weight:100 900; }
+  * { box-sizing:border-box; margin:0; }
+  html { width:1200px; height:630px; }
+  body {
+    position:relative; width:1200px; height:630px; overflow:hidden; padding:66px 72px;
+    display:grid; grid-template-rows:auto 1fr auto;
+    color:#f4f1ea; background:#111315;
+    font-family:"Onest", sans-serif;
+  }
+  .veil {
+    position:absolute; inset:0;
+    background:radial-gradient(110% 85% at 84% 8%, rgba(241,90,36,0.13), transparent 56%),
+               radial-gradient(85% 65% at 6% 102%, rgba(50,56,60,0.5), transparent 60%);
+  }
+  .mark, .body, .foot { position:relative; }
+  .mark { width:152px; height:32px; }
+  .body { align-self:center; padding-top:18px; }
+  h1 { font-size:98px; line-height:0.86; font-weight:520; letter-spacing:-0.062em; }
+  .lead { margin-top:24px; max-width:700px; color:#a8aeb1; font-size:22px; line-height:1.45; }
+  .rule { height:2px; margin-top:40px; background:linear-gradient(90deg,#f15a24 0,#f15a24 58%,rgba(241,90,36,0) 100%); }
+  .foot { display:flex; justify-content:space-between; align-items:baseline;
+          color:#a8aeb1; font-size:14px; letter-spacing:0.17em; text-transform:uppercase; }
+  .foot b { color:#f4f1ea; font-weight:600; }
+</style>
+</head>
+<body>
+  <span class="veil"></span>
+  <img class="mark" src="../assets/brand/asg-lockup-mark.svg" alt="">
+  <div class="body">
+    <h1>Current vehicles</h1>
+    <p class="lead">Specified, individually documented cars offered through Automotive Supply Group.</p>
+    <div class="rule"></div>
+  </div>
+  <p class="foot"><b>offers.asg-hub.com</b><span>Private proposals</span></p>
+</body>
+</html>

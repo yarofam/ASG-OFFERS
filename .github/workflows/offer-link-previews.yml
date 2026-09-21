@@ -1,43 +1,65 @@
-name: Bake offer link previews
+name: Publish offers
 
-# Messengers read og:image from the served HTML and need an absolute URL, which is
-# only known once the offer folder has a name. This fills it in from that name, so
-# publishing stays a plain copy of the offer folder into o/<anything>/.
+# Two things happen after an offer folder is pushed, in this order and in one
+# commit, so the two steps never race each other for the push:
+#
+#   1. Messengers read og:image from the served HTML and need an absolute URL,
+#      which is only known once the offer folder has a name. {{OFFER_URL}} is
+#      filled in from that name, so publishing stays a plain copy of the offer
+#      folder into o/<anything>/.
+#   2. The catalogue at the site root (index.html) is rebuilt from whatever is
+#      in o/ — publishing or removing an offer never needs a hand-edited index.
 
 on:
   push:
-    paths: [ "o/**/index.html" ]
+    paths:
+      - "o/**"
+      - "catalog.json"
+      - "catalog.css"
+      - "tools/build-catalog.mjs"
+      - ".github/workflows/offer-link-previews.yml"
 
 permissions:
   contents: write
 
 jobs:
-  bake:
+  publish:
     runs-on: ubuntu-latest
     env:
       BASE_URL: https://offers.asg-hub.com
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The catalogue orders vehicles newest first, which needs the commit
+          # that added each offer folder.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
 
       - name: Fill {{OFFER_URL}} from each offer folder name
         run: |
           set -e
-          changed=0
           for file in o/*/index.html; do
             [ -e "$file" ] || continue
             grep -q '{{OFFER_URL}}' "$file" || continue
             slug="$(basename "$(dirname "$file")")"
             sed -i "s#{{OFFER_URL}}#${BASE_URL}/o/${slug}#g" "$file"
             echo "baked $file -> ${BASE_URL}/o/${slug}"
-            changed=1
           done
-          echo "changed=$changed" >> "$GITHUB_ENV"
 
-      - name: Commit the filled URLs
-        if: env.changed == '1'
+      - name: Rebuild the catalogue
+        run: node tools/build-catalog.mjs
+
+      - name: Commit what changed
         run: |
           git config user.name "asg-offers-bot"
           git config user.email "bot@asg-hub.com"
-          git add o/*/index.html
-          git commit -m "Bake offer link-preview URLs"
+          git add o index.html
+          if git diff --cached --quiet; then
+            echo "nothing to commit"
+            exit 0
+          fi
+          git commit -m "Bake offer link-preview URLs and rebuild the catalogue"
           git push
