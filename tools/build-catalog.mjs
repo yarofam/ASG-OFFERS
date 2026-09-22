@@ -320,9 +320,13 @@ ${offers.map((offer, index) => renderCard(offer, index, config.showPrices)).join
 
 const config = readConfig();
 const offers = collectOffers(config);
+
+/* "Updated" means the last time the shelf itself changed, not the last time
+   this script ran: rebuilding on an unrelated push must not move the date. */
+const latest = Math.max(0, ...offers.map((offer) => offer.published));
 const updated = new Intl.DateTimeFormat("en-GB", {
   day: "numeric", month: "short", year: "numeric", timeZone: "UTC"
-}).format(new Date());
+}).format(latest ? new Date(latest * 1000) : new Date());
 
 writeFileSync(join(ROOT, "index.html"), renderPage(offers, config, updated));
 console.log(`catalogue: ${offers.length} vehicles -> index.html`);
