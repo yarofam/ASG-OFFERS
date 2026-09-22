@@ -109,7 +109,11 @@ h1,h2,h3,p{margin:0;text-wrap:pretty}
 .topbar{position:relative;display:flex;flex-wrap:wrap;justify-content:center;padding:12px var(--page) 14px;gap:10px}
 .topbar__brand{width:100%;max-width:300px;flex:0 0 100%;justify-self:center}
 .topbar__count,.topbar__meta{width:auto;font-size:10px;letter-spacing:0.12em}
-.topbar__count b{font-size:16px}
+/* Post-handoff (22 Sept): on a phone the count and the date share one row, and
+   a 16px number beside 10px capitals pulled the eye straight to it. One weight
+   above the line is enough; the dot separates it from the date. */
+.topbar__count b{font-size:10px;font-weight:700;letter-spacing:0.12em}
+.topbar__count::after{content:"·";margin-left:10px;color:var(--iron-700)}
 }
 @media (max-width:640px){
 .filterbar__inner{padding:12px var(--page);flex-direction:column;align-items:stretch;gap:10px}
