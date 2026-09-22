@@ -1,43 +1,76 @@
-name: Bake offer link previews
+name: Publish offers
 
-# Messengers read og:image from the served HTML and need an absolute URL, which is
-# only known once the offer folder has a name. This fills it in from that name, so
-# publishing stays a plain copy of the offer folder into o/<anything>/.
+# Everything that has to happen after an offer folder is pushed, in one job and
+# one commit, so no two steps race each other for the push:
+#
+#   1. Messengers read og:image from the served HTML and need an absolute URL,
+#      which is only known once the offer folder has a name. {{OFFER_URL}} is
+#      filled from that name, so publishing stays a plain copy of the folder
+#      into o/<anything>/.
+#   2. The catalogue at the site root is rebuilt from whatever is in o/ —
+#      its cards, its card photographs, the count and the date.
+#   3. The catalogue's own {{SITE_URL}} is filled the same way {{OFFER_URL}} is.
 
 on:
   push:
-    paths: [ "o/**/index.html" ]
+    paths:
+      - "o/**"
+      - "catalog.json"
+      - "templates/catalog/**"
+      - "tools/build-catalog.mjs"
+      - "package.json"
+      - ".github/workflows/offer-link-previews.yml"
 
 permissions:
   contents: write
 
 jobs:
-  bake:
+  publish:
     runs-on: ubuntu-latest
     env:
       BASE_URL: https://offers.asg-hub.com
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The catalogue orders vehicles newest first, which needs the commit
+          # that added each offer folder.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # sharp renders the card photographs. If it cannot be installed the build
+      # still runs: it keeps the photographs already committed.
+      - name: Install build dependencies
+        run: npm install --no-audit --no-fund
+        continue-on-error: true
 
       - name: Fill {{OFFER_URL}} from each offer folder name
         run: |
           set -e
-          changed=0
           for file in o/*/index.html; do
             [ -e "$file" ] || continue
             grep -q '{{OFFER_URL}}' "$file" || continue
             slug="$(basename "$(dirname "$file")")"
             sed -i "s#{{OFFER_URL}}#${BASE_URL}/o/${slug}#g" "$file"
             echo "baked $file -> ${BASE_URL}/o/${slug}"
-            changed=1
           done
-          echo "changed=$changed" >> "$GITHUB_ENV"
 
-      - name: Commit the filled URLs
-        if: env.changed == '1'
+      - name: Rebuild the catalogue
+        run: node tools/build-catalog.mjs
+
+      - name: Fill {{SITE_URL}} in the catalogue
+        run: sed -i "s#{{SITE_URL}}#${BASE_URL}#g" index.html
+
+      - name: Commit what changed
         run: |
           git config user.name "asg-offers-bot"
           git config user.email "bot@asg-hub.com"
-          git add o/*/index.html
-          git commit -m "Bake offer link-preview URLs"
+          git add o index.html assets/media
+          if git diff --cached --quiet; then
+            echo "nothing to commit"
+            exit 0
+          fi
+          git commit -m "Bake offer link-preview URLs and rebuild the catalogue"
           git push

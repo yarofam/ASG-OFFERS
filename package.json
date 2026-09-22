@@ -1,0 +1,12 @@
+{
+  "name": "asg-offers",
+  "private": true,
+  "type": "module",
+  "description": "Static offer pages and the catalogue at offers.asg-hub.com",
+  "scripts": {
+    "build": "node tools/build-catalog.mjs"
+  },
+  "devDependencies": {
+    "sharp": "^0.34.0"
+  }
+}
