@@ -23,6 +23,35 @@ const TEMPLATE = join(ROOT, "templates", "catalog", "index.html");
 const PHOTO_DIR = join(ROOT, "assets", "media");
 const PHOTO = { width: 900, height: 563, quality: [85, 76, 68], maxBytes: 100 * 1024 };
 
+/* The house veil, baked into the card photograph. The offer pages and the link
+   previews all sit their type over a darkened frame, and the shelf reads as one
+   family with them once its photographs carry the same grade. It stays gentle
+   on purpose: nothing is printed on top here, and two of the cars are black —
+   a veil heavy enough to seat a headline turns a black Cullinan into mud. The
+   bias to the left and to the bottom also seats the card's index and rule,
+   which the design places over the photograph. */
+const VEIL = Buffer.from(`<svg width="${PHOTO.width}" height="${PHOTO.height}" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="side" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="#0a0c0d" stop-opacity="0.46"/>
+<stop offset="0.34" stop-color="#0a0c0d" stop-opacity="0.16"/>
+<stop offset="0.7" stop-color="#0a0c0d" stop-opacity="0.04"/>
+<stop offset="1" stop-color="#0a0c0d" stop-opacity="0.12"/>
+</linearGradient>
+<linearGradient id="base" x1="0" y1="1" x2="0" y2="0">
+<stop offset="0" stop-color="#0a0c0d" stop-opacity="0.42"/>
+<stop offset="0.46" stop-color="#0a0c0d" stop-opacity="0"/>
+</linearGradient>
+<linearGradient id="crown" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#0a0c0d" stop-opacity="0.30"/>
+<stop offset="0.26" stop-color="#0a0c0d" stop-opacity="0"/>
+</linearGradient>
+</defs>
+<rect width="${PHOTO.width}" height="${PHOTO.height}" fill="url(#side)"/>
+<rect width="${PHOTO.width}" height="${PHOTO.height}" fill="url(#base)"/>
+<rect width="${PHOTO.width}" height="${PHOTO.height}" fill="url(#crown)"/>
+</svg>`);
+
 /* Longest first: "Rolls-Royce" must win before "Royce", "Mercedes-AMG" before
    "Mercedes-Benz". Unknown makes fall back to the first word of the title. */
 const BRANDS = [
@@ -219,6 +248,7 @@ async function renderPhotos(offers) {
         for (const quality of PHOTO.quality) {
           rendered = await sharp(offer.source)
             .resize(PHOTO.width, PHOTO.height, { fit: "cover", position: "centre" })
+            .composite([{ input: VEIL, top: 0, left: 0 }])
             .webp({ quality })
             .toBuffer();
           if (rendered.length <= PHOTO.maxBytes) break;
