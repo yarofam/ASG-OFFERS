@@ -1,0 +1,62 @@
+/* ASG catalogue — enquiry block.
+ *
+ * A separate file on purpose: catalog.css and catalog.js came from the design
+ * system and are not edited here. This block is built from the same tokens, so
+ * it reads as part of the page, and can be replaced wholesale when the design
+ * system delivers its own form. */
+
+.enquiry{padding:clamp(56px,8vw,104px) var(--page) clamp(48px,6vw,80px);border-top:1px solid var(--hairline-soft);background:var(--iron-900)}
+.enquiry__inner{display:grid;grid-template-columns:minmax(0,0.85fr) minmax(0,1.15fr);column-gap:clamp(32px,6vw,88px);row-gap:36px;align-items:start}
+.enquiry__intro h2{margin-top:18px;font-size:clamp(30px,3.4vw,46px);line-height:1.02;font-weight:520;letter-spacing:-0.04em}
+.enquiry__lead{margin-top:18px;max-width:38ch;color:var(--silver);font-size:15px;line-height:1.6}
+.enquiry__note{margin-top:14px;max-width:38ch;color:var(--muted);font-size:12px;line-height:1.6}
+
+.enquiry-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.field{display:flex;flex-direction:column;gap:8px;min-width:0}
+.field--wide{grid-column:1 / -1}
+.field > span{color:var(--silver);font-size:10px;font-weight:650;letter-spacing:0.15em;text-transform:uppercase}
+.field input,.field select,.field textarea{
+  width:100%;min-height:50px;padding:13px 14px;
+  color:#f2f0eb;background:var(--iron-950);
+  border:1px solid var(--hairline);border-radius:2px;
+  font-family:inherit;font-size:15px;line-height:1.4;
+  transition:border-color 160ms ease,background 160ms ease}
+.field textarea{min-height:120px;resize:vertical}
+.field select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--silver) 50%),linear-gradient(135deg,var(--silver) 50%,transparent 50%);background-position:calc(100% - 20px) calc(50% + 2px),calc(100% - 14px) calc(50% + 2px);background-size:6px 6px,6px 6px;background-repeat:no-repeat;padding-right:40px}
+.field input::placeholder,.field textarea::placeholder{color:var(--muted)}
+.field input:hover,.field select:hover,.field textarea:hover{border-color:rgba(242,240,235,0.3)}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--signal);background:#0e1012}
+.field.is-invalid input,.field.is-invalid select{border-color:#c9553f}
+.field-hint{color:var(--muted);font-size:11px;line-height:1.5}
+.field-error{color:#e08a76;font-size:11px;line-height:1.5}
+
+.enquiry-form__trap{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+.enquiry-form__foot{grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;margin-top:6px;padding-top:20px;border-top:1px solid var(--hairline-soft)}
+.enquiry-form__foot p{max-width:46ch;color:var(--muted);font-size:12px;line-height:1.55}
+.enquiry-form__foot p.is-error{color:#e08a76}
+
+.enquiry-submit{min-height:52px;padding:0 24px;display:inline-flex;align-items:center;gap:14px;
+  color:var(--iron-950);background:var(--signal);border:1px solid var(--signal);border-radius:2px;
+  font-size:14px;font-weight:650;letter-spacing:0.02em;
+  transition:transform 160ms ease,background 160ms ease}
+.enquiry-submit:hover{transform:translateY(-1px);background:var(--signal-bright)}
+.enquiry-submit[disabled]{opacity:0.55;cursor:default;transform:none}
+
+.enquiry-success{grid-column:1 / -1;max-width:560px;padding:28px;background:var(--iron-950);border:1px solid var(--hairline)}
+.enquiry-success__mark{width:44px;height:44px;display:grid;place-items:center;color:var(--iron-950);background:var(--signal)}
+.enquiry-success h3{margin-top:20px;font-size:22px;line-height:1.15;font-weight:560;letter-spacing:-0.02em}
+.enquiry-success p{margin-top:12px;color:var(--silver);font-size:14px;line-height:1.6}
+.enquiry-success dl{margin-top:22px;padding-top:16px;display:flex;gap:12px;align-items:baseline;border-top:1px solid var(--hairline-soft)}
+.enquiry-success dt{color:var(--muted);font-size:10px;font-weight:650;letter-spacing:0.15em;text-transform:uppercase}
+.enquiry-success dd{margin:0;font-size:15px;letter-spacing:0.04em}
+
+@media (max-width:900px){
+.enquiry__inner{grid-template-columns:minmax(0,1fr)}
+.enquiry__lead,.enquiry__note{max-width:none}
+}
+@media (max-width:620px){
+.enquiry-form{grid-template-columns:minmax(0,1fr)}
+.enquiry-form__foot{flex-direction:column;align-items:stretch}
+.enquiry-submit{justify-content:center}
+}

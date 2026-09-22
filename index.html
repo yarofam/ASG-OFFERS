@@ -7,7 +7,7 @@
 <meta name="color-scheme" content="dark">
 <meta name="robots" content="noindex, noarchive">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; form-action 'none'; base-uri 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src https://api.web3forms.com; form-action 'none'; base-uri 'none'">
 <title>Current vehicles — ASG</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
@@ -27,6 +27,7 @@
 <meta name="twitter:image" content="https://offers.asg-hub.com/share.jpg">
 <link rel="stylesheet" href="catalog.css">
 <link rel="stylesheet" href="brand-interaction.css">
+<link rel="stylesheet" href="enquiry.css">
 </head>
 <body>
 <a class="skip-link" href="#grid">Skip to vehicles</a>
@@ -190,17 +191,56 @@
 <p class="grid-empty" id="gridEmpty" hidden>No vehicles from this marque are currently offered. <button class="grid-empty__reset" type="button" data-filter="all">Show all vehicles</button></p>
 </main>
 
+<!-- ASG:ENQUIRY — added outside the design-system handoff (22 Sept).
+     Styles in enquiry.css, logic in enquiry.js, both separate files so
+     catalog.css and catalog.js stay untouched. Replace wholesale when the
+     design system delivers its own form block. -->
+<section class="enquiry" id="enquiry" aria-labelledby="enquiryTitle">
+<div class="enquiry__inner">
+<div class="enquiry__intro">
+<p class="eyebrow">ASG · Private client service</p>
+<h2 id="enquiryTitle">Speak with ASG</h2>
+<p class="enquiry__lead">Tell us how to reach you and what you need — a vehicle from this list, another car we should find, or delivery and purchase terms.</p>
+<p class="enquiry__note">Your enquiry goes to the ASG team. Nothing you write here appears on this page.</p>
+</div>
+
+<form class="enquiry-form" id="enquiryForm" novalidate>
+<label class="field"><span>Your name (required)</span><input id="enquiryName" name="name" type="text" autocomplete="name" maxlength="160" required aria-describedby="nameError"><small class="field-error" id="nameError" hidden></small></label>
+<label class="field"><span>Preferred contact (required)</span><select id="enquiryChannel" name="contactChannel" required aria-describedby="channelError"><option value="">Select a channel</option><option>WhatsApp</option><option>Telegram</option><option>Email</option><option>Phone</option></select><small class="field-error" id="channelError" hidden></small></label>
+<label class="field field--wide"><span id="contactLabel">Contact (required)</span><input id="enquiryContact" name="contact" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="254" placeholder="Choose your preferred channel above" required aria-describedby="contactHint contactError"><small class="field-hint" id="contactHint">Choose a channel above.</small><small class="field-error" id="contactError" hidden></small></label>
+<label class="field"><span>Destination (optional)</span><input name="destination" type="text" maxlength="240" placeholder="Country and city"></label>
+<label class="field"><span>I would like to discuss</span><select id="enquiryTopic" name="topic"><option value="LIST_VEHICLE">A vehicle from the list</option><option value="OTHER_VEHICLE">Another vehicle or a search</option><option value="DELIVERY">Delivery and purchase terms</option></select></label>
+<label class="field field--wide" id="vehicleField"><span id="vehicleLabel">Which vehicle? (required)</span><input id="enquiryVehicle" name="requestedVehicleText" type="text" maxlength="1000" placeholder="Name it, or paste the link from the card — several is fine." aria-describedby="vehicleError"><small class="field-error" id="vehicleError" hidden></small></label>
+<label class="field field--wide"><span>Message (optional)</span><textarea name="message" rows="4" maxlength="4000" placeholder="Your questions, timing, or anything that would help us answer properly."></textarea></label>
+<input class="enquiry-form__trap" id="enquiryBotcheck" type="checkbox" name="botcheck" tabindex="-1" aria-hidden="true" autocomplete="off">
+<input type="hidden" name="context" id="enquiryContext">
+<div class="enquiry-form__foot">
+<p id="enquiryStatus" role="status" aria-live="polite" aria-atomic="true">Complete the form and select Send enquiry.</p>
+<button class="enquiry-submit" id="enquirySubmit" type="submit">Send enquiry <span aria-hidden="true">↗</span></button>
+</div>
+</form>
+
+<div class="enquiry-success" id="enquirySuccess" role="status" hidden>
+<div class="enquiry-success__mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9.5 18 20 6.5"></path></svg></div>
+<h3 tabindex="-1">Your enquiry is with the ASG team.</h3>
+<p>We have your details and will reply through the channel you chose. Keep the reference below if you need to follow up.</p>
+<dl><dt>Reference</dt><dd class="asg-data" id="enquirySuccessRef"></dd></dl>
+</div>
+</div>
+</section>
+
 <footer class="footer">
 <div class="footer__inner">
 <p class="footer__note">All prices are net and exclude VAT, destination taxes, registration and local costs. Availability, timing and terms are reconfirmed per vehicle before any commitment.</p>
 <div class="footer__side">
 <p class="footer__line">Confidential · Non-binding</p>
-<p class="footer__line"><a href="mailto:info@asg-hub.com">info@asg-hub.com</a></p>
+<p class="footer__line"><a href="#enquiry">Send an enquiry</a> · <a href="mailto:info@asg-hub.com">info@asg-hub.com</a></p>
 </div>
 </div>
 </footer>
 
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 <script src="catalog.js"></script>
+<script src="enquiry.js"></script>
 </body>
 </html>

@@ -31,13 +31,15 @@ body{display:flex;flex-direction:column;align-items:flex-start;gap:24px;padding:
              radial-gradient(100% 80% at 50% 46%, rgba(70,78,84,0.34), transparent 66%),
              radial-gradient(120% 90% at 50% 118%, rgba(0,0,0,0.65), transparent 62%)}
 
-/* The lockup sits at 47% of the frame width, centred — comfortably inside the
-   safe area, so a messenger's crop never touches it. */
-.lockup{position:relative;width:564px;height:auto;display:block}
+/* The lockup carries the whole card: 78% of the frame width, centred. That
+   leaves an 11% margin each side — a messenger trims a few percent at most,
+   so the mark is never clipped, and at this size it still reads on a phone
+   thumbnail. */
+.lockup{position:relative;width:936px;height:auto;display:block}
 
 /* A hairline that stops short of the edges, to seat the mark on the ground
    rather than float it. */
-.card::after{content:"";position:absolute;left:18%;right:18%;top:76%;height:1px;
+.card::after{content:"";position:absolute;left:14%;right:14%;top:79%;height:1px;
   background:linear-gradient(90deg,transparent 0,rgba(242,240,235,0.16) 22%,rgba(242,240,235,0.16) 78%,transparent 100%)}
 
 .hint{max-width:1200px;color:#7d8285;font-size:12px;line-height:1.7;letter-spacing:.06em}
