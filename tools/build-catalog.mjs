@@ -1,24 +1,27 @@
 #!/usr/bin/env node
-/* Builds the root catalogue page (index.html) from the offers published in o/.
+/* Builds the catalogue page at the site root from the offers published in o/.
  *
- * Every offer folder stays untouched and self-contained: this script only reads
- * each offer's own data file (or its og: tags, for single-file offers) and
- * writes one file — index.html at the repository root. Publishing an offer
- * therefore stays a plain copy of a folder into o/<slug>/; the catalogue
- * rebuilds itself from what is there.
+ * The design is not generated: templates/catalog/index.html is the page as the
+ * design system delivered it, and this script only replaces what sits between
+ * its ASG:FILTERS and ASG:CARDS markers, fills {{COUNT}} and {{UPDATED}}, and
+ * renders one card photograph per vehicle. {{SITE_URL}} is left for the
+ * workflow to bake, the same way offers get {{OFFER_URL}}.
  *
- * Presentation lives in catalog.css / catalog.js; catalog.json carries the
- * editorial choices (headline, price visibility, order, hidden offers).
+ * Offer folders are read, never written. catalog.json carries the editorial
+ * choices (headline copy lives in the template; order, hidden offers, price
+ * visibility and per-offer photo overrides live here).
  */
 
-import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, readdirSync, statSync, mkdirSync, unlinkSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { createContext, runInContext } from "node:vm";
 import { join, basename, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const SITE = "https://offers.asg-hub.com";
+const TEMPLATE = join(ROOT, "templates", "catalog", "index.html");
+const PHOTO_DIR = join(ROOT, "assets", "media");
+const PHOTO = { width: 900, height: 563, quality: [85, 76, 68], maxBytes: 100 * 1024 };
 
 /* Longest first: "Rolls-Royce" must win before "Royce", "Mercedes-AMG" before
    "Mercedes-Benz". Unknown makes fall back to the first word of the title. */
@@ -32,17 +35,9 @@ const BRANDS = [
 ];
 
 const CURRENCIES = ["EUR", "GBP", "USD", "CHF", "AED", "SAR", "QAR", "CNY", "JPY", "SEK", "NOK", "DKK", "PLN", "CZK"];
-const SYMBOLS = { "£": "GBP", "€": "EUR", "$": "USD", "¥": "JPY", "₣": "CHF", "د.إ": "AED" };
+const SYMBOLS = { "£": "GBP", "€": "EUR", "$": "USD", "¥": "JPY", "₣": "CHF" };
 
-const DEFAULTS = {
-  eyebrow: "ASG · Automotive Supply Group",
-  title: "Current vehicles",
-  lead: "Every car below is a specified, individually documented vehicle held or configured through ASG. Open a vehicle for its full specification, evidence and commercial terms.",
-  showPrices: true,
-  order: [],
-  hidden: [],
-  images: {}
-};
+const DEFAULTS = { showPrices: true, order: [], hidden: [], images: {} };
 
 /* ---------- small helpers ---------- */
 
@@ -53,6 +48,8 @@ const esc = (s) => String(s ?? "")
 const unesc = (s) => String(s ?? "")
   .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"')
   .replace(/&#0?39;|&apos;/g, "'").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&");
+
+const pad = (n) => String(n).padStart(2, "0");
 
 function readConfig() {
   const path = join(ROOT, "catalog.json");
@@ -109,10 +106,10 @@ function parsePrice(raw) {
     const symbol = Object.keys(SYMBOLS).find((key) => text.includes(key));
     currency = symbol ? SYMBOLS[symbol] : "";
   }
-  return { amount: amount[0].trim(), currency };
+  return `${amount[0].trim()}${currency ? ` ${currency}` : ""}`;
 }
 
-/* Newest offer first. The catalogue is a stock list, so what arrived last is
+/* Newest offer first: the catalogue is a stock list, so what arrived last is
    what brokers want to see first. Needs full history (fetch-depth: 0); with a
    shallow checkout every offer scores 0 and the order falls back to the
    configured one, then alphabetical. */
@@ -127,16 +124,14 @@ function firstPublished(slug) {
   }
 }
 
-/* The card shows the offer's own hero image. Some packages carry leftover
-   thumbnails from the template under a name the offer itself never renders
-   (o/8sq511 has a Ferrari thumbs/hero.webp), so a thumbnail is only trusted
-   when the offer's gallery actually uses that file. Otherwise the full-size
-   hero is used — it is exactly what the offer page shows. A better frame can be
-   named per offer under "images" in catalog.json, as a path inside the offer
-   folder; the offer package itself is never edited. */
-function cardImage(slug, data, overrides) {
+/* The card shows the offer's own hero. Some packages carry leftover thumbnails
+   from the template under a name the offer itself never renders (o/8sq511 has
+   a Ferrari thumbs/hero.webp), so a thumbnail is only trusted when the offer's
+   gallery actually uses that file. A better frame can be named per offer under
+   "images" in catalog.json; the offer package itself is never edited. */
+function photoSource(slug, data, overrides) {
   const override = overrides && overrides[slug];
-  if (override && existsSync(join(ROOT, "o", slug, override))) return `o/${slug}/${override}`;
+  if (override && existsSync(join(ROOT, "o", slug, override))) return join(ROOT, "o", slug, override);
 
   const hero = data && typeof data.hero === "string" ? data.hero : "";
   const thumbBase = data && typeof data.thumbBase === "string" ? data.thumbBase : "assets/media/thumbs/";
@@ -153,7 +148,7 @@ function cardImage(slug, data, overrides) {
   candidates.push("share.jpg");
 
   const found = candidates.find((relative) => existsSync(join(ROOT, "o", slug, relative)));
-  return found ? `o/${slug}/${found}` : "";
+  return found ? join(ROOT, "o", slug, found) : "";
 }
 
 /* ---------- collect ---------- */
@@ -180,10 +175,9 @@ function collectOffers(config) {
         brand,
         model,
         spec: (data.subtitle || metaContent(html, "property", "og:description") || "").trim(),
-        price: parsePrice(data.price),
-        availability: (data.availabilityStatus || "").trim(),
-        location: (data.locationStatus || "").trim(),
-        image: cardImage(slug, data, config.images),
+        price: config.showPrices ? parsePrice(data.price) : "",
+        status: (data.availabilityStatus || data.locationStatus || "").trim(),
+        source: photoSource(slug, data, config.images),
         published: firstPublished(slug)
       };
     });
@@ -198,128 +192,120 @@ function collectOffers(config) {
   });
 }
 
+/* ---------- photographs ---------- */
+
+/* One 900px 16:10 WebP per vehicle at assets/media/<slug>.webp, so the shelf
+   does not pull the offers' full-size heroes. sharp is only needed when a
+   photograph is missing or its source changed; if it cannot be loaded at all,
+   existing files are kept and anything missing falls back to the offer's own
+   image, which is heavier but correct. */
+async function renderPhotos(offers) {
+  mkdirSync(PHOTO_DIR, { recursive: true });
+
+  let sharp = null;
+  try {
+    ({ default: sharp } = await import("sharp"));
+  } catch {
+    console.warn("sharp unavailable — keeping the card photographs already in assets/media");
+  }
+
+  for (const offer of offers) {
+    const target = join(PHOTO_DIR, `${offer.slug}.webp`);
+    if (sharp && offer.source) {
+      try {
+        /* Studio renders compress to a fraction of a live photograph, so the
+           quality steps down until the file lands inside the design's budget. */
+        let rendered;
+        for (const quality of PHOTO.quality) {
+          rendered = await sharp(offer.source)
+            .resize(PHOTO.width, PHOTO.height, { fit: "cover", position: "centre" })
+            .webp({ quality })
+            .toBuffer();
+          if (rendered.length <= PHOTO.maxBytes) break;
+        }
+        /* Write only on change: an identical rebuild must not show up as a diff. */
+        if (!existsSync(target) || !readFileSync(target).equals(rendered)) {
+          writeFileSync(target, rendered);
+          console.log(`  photo ${offer.slug}.webp ${(rendered.length / 1024).toFixed(0)} kB`);
+        }
+      } catch (error) {
+        console.warn(`  photo ${offer.slug} failed (${error.message})`);
+      }
+    }
+    offer.photo = existsSync(target)
+      ? `assets/media/${offer.slug}.webp`
+      : (offer.source ? offer.source.slice(ROOT.length + 1) : "");
+  }
+
+  /* A removed offer must not leave its photograph behind. */
+  const live = new Set(offers.map((offer) => `${offer.slug}.webp`));
+  for (const file of readdirSync(PHOTO_DIR)) {
+    if (file.endsWith(".webp") && !live.has(file)) {
+      unlinkSync(join(PHOTO_DIR, file));
+      console.log(`  removed stale ${file}`);
+    }
+  }
+}
+
 /* ---------- render ---------- */
 
-function renderCard(offer, index, showPrices) {
-  const number = String(index + 1).padStart(2, "0");
-  const eager = index < 3;
-  const media = offer.image
-    ? `<img class="card__image asg-photo" src="${esc(offer.image)}" alt="" width="1200" height="750" loading="${eager ? "eager" : "lazy"}"${eager ? ' fetchpriority="high"' : ""} decoding="async">`
-    : `<span class="card__image card__image--empty" aria-hidden="true"></span>`;
+function replaceBlock(html, name, body) {
+  const pattern = new RegExp(`(<!-- ASG:${name}:START -->)[\\s\\S]*?(<!-- ASG:${name}:END -->)`);
+  if (!pattern.test(html)) throw new Error(`marker ASG:${name} missing from templates/catalog/index.html`);
+  return html.replace(pattern, `$1\n${body}\n$2`);
+}
 
-  const price = showPrices && offer.price
-    ? `<span class="card__price"><small>Net</small><b class="asg-data">${esc(offer.price.amount)}${offer.price.currency ? ` ${esc(offer.price.currency)}` : ""}</b></span>`
-    : `<span class="card__price"><small>Price</small><b>On request</b></span>`;
+/* The link icon is the only icon on the page; take it from the template rather
+   than keeping a second copy here. */
+function copyIcon(template) {
+  const icon = template.match(/<button class="card__copy"[\s\S]*?(<svg[\s\S]*?<\/svg>)/);
+  return icon ? icon[1] : "";
+}
 
-  const status = offer.availability || offer.location
-    ? `<span class="card__status">${esc(offer.availability || offer.location)}</span>`
-    : "";
+function renderCards(offers, icon) {
+  return offers.map((offer, index) => {
+    const name = `${offer.brand} ${offer.model}`.trim();
+    const href = `o/${offer.slug}/`;
+    const photo = offer.photo
+      ? `<img class="card__photo" src="${esc(offer.photo)}" alt="${esc(name)}" width="${PHOTO.width}" height="${PHOTO.height}" loading="lazy" decoding="async">`
+      : "";
+    const price = offer.price
+      ? `<p class="card__price asg-data"><span>Net</span><strong>${esc(offer.price)}</strong></p>`
+      : `<p class="card__price card__price--request"><span>Net</span><strong>On request</strong></p>`;
+    const status = offer.status ? `\n<p class="card__status">${esc(offer.status)}</p>` : "";
 
-  return `        <a class="card" href="${esc(`o/${offer.slug}/`)}" data-brand="${esc(offer.brand)}">
-          <span class="card__media">${media}<span class="card__index">${number}</span></span>
-          <span class="card__body">
-            <span class="card__brand">${esc(offer.brand)}</span>
-            <span class="card__model">${esc(offer.model)}</span>
-            ${offer.spec ? `<span class="card__spec">${esc(offer.spec)}</span>` : ""}
-          </span>
-          <span class="card__foot">${price}${status}</span>
-        </a>`;
+    return `<article class="card" data-brand="${esc(offer.brand)}">
+<div class="card__frame">
+${photo}
+<span class="card__index asg-data" aria-hidden="true">${pad(index + 1)}</span>
+<button class="card__copy" type="button" data-copy="${esc(href)}" aria-label="Copy link to ${esc(name)}">${icon}<span>Copy link</span></button>
+<i class="card__rule" aria-hidden="true"></i>
+</div>
+<div class="card__body">
+<p class="card__brand">${esc(offer.brand)}</p>
+<h3 class="card__model"><a class="card__link" href="${esc(href)}">${esc(offer.model)}</a></h3>
+${offer.spec ? `<p class="card__spec">${esc(offer.spec)}</p>` : ""}
+</div>
+<div class="card__foot">
+${price}${status}
+</div>
+</article>`;
+  }).join("\n");
 }
 
 function renderFilters(offers) {
   const brands = [...new Set(offers.map((offer) => offer.brand))].sort((a, b) => a.localeCompare(b));
-  if (brands.length < 2) return "";
   const chips = brands.map((brand) =>
-    `          <button class="chip" type="button" data-filter="${esc(brand)}">${esc(brand)}</button>`
-  ).join("\n");
-  return `      <div class="filters" id="filters" role="group" aria-label="Filter by make">
-          <button class="chip is-active" type="button" data-filter="all">All vehicles</button>
-${chips}
-      </div>`;
-}
-
-function renderPage(offers, config, updated) {
-  const count = String(offers.length).padStart(2, "0");
-  const description = `${offers.length} specified vehicles currently offered through ASG — Automotive Supply Group.`;
-  /* The brand file carries a large c2pa <metadata> blob; it has no business
-     being inlined into every page load. */
-  const lockup = readFileSync(join(ROOT, "assets", "brand", "asg-lockup-dark.svg"), "utf8")
-    .replace(/<\?xml[^>]*\?>\s*/i, "")
-    .replace(/<metadata>[\s\S]*?<\/metadata>/i, "")
-    .replace(/<svg /i, '<svg class="brand-lockup" aria-hidden="true" focusable="false" ');
-
-  return `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#111315">
-  <meta name="color-scheme" content="dark">
-  <title>ASG — Current Vehicles</title>
-  <meta name="description" content="${esc(description)}">
-  <meta name="robots" content="noindex, noarchive">
-  <meta name="referrer" content="no-referrer">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'">
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="ASG — Automotive Supply Group">
-  <meta property="og:title" content="ASG — Current Vehicles">
-  <meta property="og:description" content="${esc(description)}">
-  <meta property="og:url" content="${SITE}/">
-  <meta property="og:image" content="${SITE}/share.jpg">
-  <meta property="og:image:type" content="image/jpeg">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="ASG — current vehicles">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="${SITE}/share.jpg">
-  <link rel="stylesheet" href="catalog.css">
-</head>
-<body>
-  <a class="skip-link" href="#vehicles">Skip to vehicles</a>
-
-  <header class="topbar">
-    <span class="topbar__brand" aria-label="ASG — Automotive Supply Group">
-${lockup.trim().split("\n").map((line) => `      ${line}`).join("\n")}
-    </span>
-    <p class="topbar__meta"><b class="asg-data">${esc(count)}</b><span>vehicles · updated ${esc(updated)}</span></p>
-  </header>
-
-  <main id="main">
-    <section class="intro">
-      <p class="eyebrow">${esc(config.eyebrow)}</p>
-      <div class="intro__grid">
-        <h1>${esc(config.title)}</h1>
-        <p class="intro__lead">${esc(config.lead)}</p>
-      </div>
-${renderFilters(offers)}
-    </section>
-
-    <section class="vehicles" id="vehicles" aria-label="Vehicles">
-      <div class="grid" id="grid">
-${offers.map((offer, index) => renderCard(offer, index, config.showPrices)).join("\n")}
-      </div>
-      <p class="grid__empty" id="gridEmpty" hidden>No vehicles for this make.</p>
-    </section>
-  </main>
-
-  <footer class="footer">
-    <p class="footer__note">Each vehicle is a private proposal prepared for a named buyer. Prices are net vehicle prices and exclude delivery, destination taxes and registration unless stated inside the offer.</p>
-    <p class="footer__meta"><span>ASG — Automotive Supply Group</span><span>offers.asg-hub.com</span></p>
-  </footer>
-
-  <script src="catalog.js"></script>
-</body>
-</html>
-`;
+    `<button class="chip" type="button" data-filter="${esc(brand)}">${esc(brand)}</button>`
+  );
+  return [`<button class="chip is-active" type="button" data-filter="all">All vehicles</button>`, ...chips].join("\n");
 }
 
 /* ---------- run ---------- */
 
 const config = readConfig();
 const offers = collectOffers(config);
+await renderPhotos(offers);
 
 /* "Updated" means the last time the shelf itself changed, not the last time
    this script ran: rebuilding on an unrelated push must not move the date. */
@@ -328,6 +314,11 @@ const updated = new Intl.DateTimeFormat("en-GB", {
   day: "numeric", month: "short", year: "numeric", timeZone: "UTC"
 }).format(latest ? new Date(latest * 1000) : new Date());
 
-writeFileSync(join(ROOT, "index.html"), renderPage(offers, config, updated));
-console.log(`catalogue: ${offers.length} vehicles -> index.html`);
+const template = readFileSync(TEMPLATE, "utf8");
+let page = replaceBlock(template, "FILTERS", renderFilters(offers));
+page = replaceBlock(page, "CARDS", renderCards(offers, copyIcon(template)));
+page = page.replace(/\{\{COUNT\}\}/g, pad(offers.length)).replace(/\{\{UPDATED\}\}/g, updated);
+
+writeFileSync(join(ROOT, "index.html"), page);
+console.log(`catalogue: ${offers.length} vehicles, updated ${updated} -> index.html`);
 for (const offer of offers) console.log(`  ${offer.slug}  ${offer.title}`);

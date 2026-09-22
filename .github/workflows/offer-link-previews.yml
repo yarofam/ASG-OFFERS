@@ -1,22 +1,24 @@
 name: Publish offers
 
-# Two things happen after an offer folder is pushed, in this order and in one
-# commit, so the two steps never race each other for the push:
+# Everything that has to happen after an offer folder is pushed, in one job and
+# one commit, so no two steps race each other for the push:
 #
 #   1. Messengers read og:image from the served HTML and need an absolute URL,
 #      which is only known once the offer folder has a name. {{OFFER_URL}} is
-#      filled in from that name, so publishing stays a plain copy of the offer
-#      folder into o/<anything>/.
-#   2. The catalogue at the site root (index.html) is rebuilt from whatever is
-#      in o/ — publishing or removing an offer never needs a hand-edited index.
+#      filled from that name, so publishing stays a plain copy of the folder
+#      into o/<anything>/.
+#   2. The catalogue at the site root is rebuilt from whatever is in o/ —
+#      its cards, its card photographs, the count and the date.
+#   3. The catalogue's own {{SITE_URL}} is filled the same way {{OFFER_URL}} is.
 
 on:
   push:
     paths:
       - "o/**"
       - "catalog.json"
-      - "catalog.css"
+      - "templates/catalog/**"
       - "tools/build-catalog.mjs"
+      - "package.json"
       - ".github/workflows/offer-link-previews.yml"
 
 permissions:
@@ -38,6 +40,12 @@ jobs:
         with:
           node-version: "20"
 
+      # sharp renders the card photographs. If it cannot be installed the build
+      # still runs: it keeps the photographs already committed.
+      - name: Install build dependencies
+        run: npm install --no-audit --no-fund
+        continue-on-error: true
+
       - name: Fill {{OFFER_URL}} from each offer folder name
         run: |
           set -e
@@ -52,11 +60,14 @@ jobs:
       - name: Rebuild the catalogue
         run: node tools/build-catalog.mjs
 
+      - name: Fill {{SITE_URL}} in the catalogue
+        run: sed -i "s#{{SITE_URL}}#${BASE_URL}#g" index.html
+
       - name: Commit what changed
         run: |
           git config user.name "asg-offers-bot"
           git config user.email "bot@asg-hub.com"
-          git add o index.html
+          git add o index.html assets/media
           if git diff --cached --quiet; then
             echo "nothing to commit"
             exit 0
