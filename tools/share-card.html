@@ -3,39 +3,50 @@
 <head>
 <meta charset="utf-8">
 <title>Catalogue share card — build tool</title>
+<!-- Source for the catalogue's share.jpg. Build tool, not a published page: it
+     lives in tools/ so the web root never serves it. Capture #card at exactly
+     1200x630 and save it as share.jpg at the repository root.
+
+     Both messengers are satisfied by the same file: exactly 1200x630 (1.91:1),
+     JPEG, well under 300 kB, with og:image:width / og:image:height declared in
+     the page head — without those WhatsApp falls back to a small square
+     thumbnail. Telegram is looser but reads the same tags.
+
+     The mark is the real vector lockup, with its descriptor, on the house
+     ground. Nothing here dates: no vehicle, no count, no date. The catalogue
+     URL never changes, and messengers cache a preview per URL forever. -->
 <style>
 @font-face{font-family:Onest;src:url("../assets/Onest.ttf") format("truetype");font-weight:100 900;font-display:block}
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{background:#15181a}
 body{display:flex;flex-direction:column;align-items:flex-start;gap:24px;padding:24px;font-family:Onest,system-ui,sans-serif}
-.card{position:relative;width:1200px;height:630px;overflow:hidden;background:#0a0c0d;color:#fff;isolation:isolate;flex:none}
-.strip{position:absolute;z-index:-3;inset:0 0 0 38%}
-.strip img{width:100%;height:100%;object-fit:cover;filter:saturate(.92) contrast(1.045) brightness(.965)}
-.veil{position:absolute;inset:0;z-index:-2;background:linear-gradient(90deg,#0a0c0d 0%,rgba(10,12,13,.96) 34%,rgba(10,12,13,.74) 50%,rgba(10,12,13,.22) 74%,rgba(10,12,13,.34) 100%),linear-gradient(0deg,rgba(10,12,13,.72) 0%,rgba(10,12,13,0) 46%)}
-.signal{position:absolute;z-index:-1;left:0;right:0;top:47%;height:2px;background:linear-gradient(90deg,#F15A24 0,#F15A24 44%,rgba(241,90,36,.22) 78%,transparent 100%)}
-.lockup{position:absolute;left:64px;top:56px;width:236px;height:auto}
-.copy{position:absolute;left:64px;right:64px;bottom:62px}
-h1{font-size:96px;font-weight:600;line-height:.9;letter-spacing:-.05em;text-shadow:0 2px 14px rgba(0,0,0,.36)}
-h1 span{display:block}
-.meta{margin-top:30px;font-size:19px;font-weight:600;letter-spacing:.17em;text-transform:uppercase;color:#FF7A45}
-.coach{position:absolute;left:0;right:0;bottom:0;height:3px;background:#F15A24;opacity:.9}
-.hint{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#7d8285;max-width:1200px;line-height:1.7}
+
+.card{position:relative;width:1200px;height:630px;overflow:hidden;background:#0a0c0d;flex:none;
+      display:grid;place-items:center}
+
+/* One diffused source from the upper right, and a floor that falls away —
+   the same low-key lighting the offer heroes use. */
+.card::before{content:"";position:absolute;inset:0;
+  background:radial-gradient(120% 95% at 76% 6%, rgba(241,90,36,0.10), transparent 58%),
+             radial-gradient(100% 80% at 50% 46%, rgba(70,78,84,0.34), transparent 66%),
+             radial-gradient(120% 90% at 50% 118%, rgba(0,0,0,0.65), transparent 62%)}
+
+/* The lockup sits at 47% of the frame width, centred — comfortably inside the
+   safe area, so a messenger's crop never touches it. */
+.lockup{position:relative;width:564px;height:auto;display:block}
+
+/* A hairline that stops short of the edges, to seat the mark on the ground
+   rather than float it. */
+.card::after{content:"";position:absolute;left:18%;right:18%;top:76%;height:1px;
+  background:linear-gradient(90deg,transparent 0,rgba(242,240,235,0.16) 22%,rgba(242,240,235,0.16) 78%,transparent 100%)}
+
+.hint{max-width:1200px;color:#7d8285;font-size:12px;line-height:1.7;letter-spacing:.06em}
 </style>
 </head>
 <body>
 <div class="card" id="card">
-  <div class="strip">
-    <img src="../assets/media/wbqmga.webp" alt="">
-  </div>
-  <div class="veil"></div>
-  <div class="signal"></div>
-  <img class="lockup" src="../assets/brand/asg-lockup-mark.svg" alt="">
-  <div class="copy">
-    <h1><span>Current</span><span>vehicles</span></h1>
-    <p class="meta">Automotive Supply Group</p>
-  </div>
-  <div class="coach"></div>
+  <img class="lockup" src="../assets/brand/asg-lockup-dark.svg" alt="">
 </div>
-<p class="hint">Build tool, not a published page — it lives in tools/ so the web root never serves it. Set the lead photograph, capture #card at exactly 1200×630 and save it as share.jpg at the repository root. The vehicle count and the date deliberately do not appear on this card: messengers cache a preview per URL, the catalogue URL never changes, and a number baked in here would keep claiming a stock we no longer have.</p>
+<p class="hint">Build tool — capture #card at exactly 1200×630, save as share.jpg at the repository root, JPEG under 300 kB. No vehicle, no count, no date: the catalogue URL never changes and messengers cache a preview per URL for weeks.</p>
 </body>
 </html>
