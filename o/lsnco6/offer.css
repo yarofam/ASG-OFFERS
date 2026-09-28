@@ -1060,7 +1060,3 @@ section[id] { scroll-margin-top: 128px; }
   .enquiry-success__ref dd { font-size: 16px; }
   .enquiry-success .button { width: 100%; margin-top: 26px; }
 }
-
-/* Offer: the model name never breaks inside a word, and holds one line from tablet up. */
-.hero h1, .hero h1 span { overflow-wrap: normal; word-break: keep-all; hyphens: none; }
-@media (min-width: 641px) { .hero h1 { font-size: clamp(52px, 5.9vw, 96px); } }

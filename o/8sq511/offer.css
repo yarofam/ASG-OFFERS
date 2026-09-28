@@ -1060,32 +1060,3 @@ section[id] { scroll-margin-top: 128px; }
   .enquiry-success__ref dd { font-size: 16px; }
   .enquiry-success .button { width: 100%; margin-top: 26px; }
 }
-
-
-/* Manufacturer configuration renders arrive on a white studio ground, so the editorial
-   veil — tuned for dark photography — leaves the hero brandline unreadable. Configuration
-   mode keeps the same left-to-right protection and adds a top strip for that line only. */
-[data-evidence-mode="configuration"] .hero__veil {
-  background:
-    linear-gradient(90deg, rgba(10, 12, 13, 0.96) 0%, rgba(10, 12, 13, 0.84) 34%, rgba(10, 12, 13, 0.28) 64%, rgba(10, 12, 13, 0.36) 100%),
-    linear-gradient(180deg, rgba(10, 12, 13, 0.88) 0%, rgba(10, 12, 13, 0.42) 9%, rgba(10, 12, 13, 0) 17%);
-}
-@media (max-width: 640px) {
-  [data-evidence-mode="configuration"] .hero__veil {
-    background:
-      linear-gradient(0deg, rgba(10, 12, 13, 0.96) 0%, rgba(10, 12, 13, 0.72) 48%, rgba(10, 12, 13, 0.16) 90%),
-      linear-gradient(90deg, rgba(10, 12, 13, 0.35), transparent),
-      linear-gradient(180deg, rgba(10, 12, 13, 0.9) 0%, rgba(10, 12, 13, 0.44) 7%, rgba(10, 12, 13, 0) 15%);
-  }
-}
-
-
-/* Four facts fit one desktop row. The base grid is a three-column system with 3n
-   border rules, so the exact four-item case gets its own track count and edges
-   rather than wrapping a single fact onto a second row. */
-@media (min-width: 641px) {
-  .facts__grid:has(.fact:nth-child(4)):not(:has(.fact:nth-child(5))) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .facts__grid:has(.fact:nth-child(4)):not(:has(.fact:nth-child(5))) .fact:nth-child(n) { padding-left: 24px; border-right: 1px solid var(--hairline-dark); border-bottom: 0; }
-  .facts__grid:has(.fact:nth-child(4)):not(:has(.fact:nth-child(5))) .fact:first-child { padding-left: 0; }
-  .facts__grid:has(.fact:nth-child(4)):not(:has(.fact:nth-child(5))) .fact:last-child { border-right: 0; }
-}

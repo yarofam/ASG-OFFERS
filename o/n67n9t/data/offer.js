@@ -1,5 +1,8 @@
 window.ASG_OFFERS = {
   "rolls-royce-black-badge-cullinan-series-ii": {
+  "fx": {"amount":444043,"base":"GBP","show":["EUR","USD","AED","CHF"],"ratesUrl":"/rates.json"},
+  "prices": [{"currency":"GBP","price":"444,043 GBP"},{"currency":"EUR","price":"517,623 EUR","note":"Indicative at the ECB rate of 28 Sept 2026: 1 GBP = 1.1657 EUR. The contract is settled in GBP."},{"currency":"USD","price":"588,952 USD","note":"Indicative at the ECB rate of 28 Sept 2026: 1 GBP = 1.3263 USD. The contract is settled in GBP."},{"currency":"AED","price":"2,162,940 AED","note":"Indicative at the ECB rate of 28 Sept 2026: 1 GBP = 4.8710 AED. The contract is settled in GBP."},{"currency":"CHF","price":"489,879 CHF","note":"Indicative at the ECB rate of 28 Sept 2026: 1 GBP = 1.1032 CHF. The contract is settled in GBP."}],
+  "deliveryTimeline": [{"title":"Availability & Confirmation","duration":"same day / 1 day"},{"title":"Buyer Details & Contract","duration":"1 – 2 days"},{"title":"Payment & Release","duration":"up to 2 days"},{"title":"Collection or Delivery","duration":"EU: 2 – 7 days; international: route dependent"},{"title":"Arrival & Handover","duration":"on arrival"}],
     slug: "rolls-royce-black-badge-cullinan-series-ii",
     reference: "ASG-OFFER-12302-31HA-27MY",
 
