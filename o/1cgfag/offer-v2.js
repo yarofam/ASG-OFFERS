@@ -106,7 +106,13 @@
       const h = document.createElement("h3"); h.textContent = s.title;
       li.append(idx, h);
       if (s.body) { const p = document.createElement("p"); p.textContent = s.body; li.append(p); }
-      if (s.duration) { const t = document.createElement("span"); t.className = "delivery-step__time asg-data"; t.textContent = s.duration; li.append(t); }
+      // duration: a string, a string with line breaks or ";", or an array — one tag per line.
+      const times = (Array.isArray(s.duration) ? s.duration : String(s.duration || "").split(/\n|;\s*/)).map((t) => String(t).trim()).filter(Boolean);
+      if (times.length) {
+        const box = document.createElement("div"); box.className = "delivery-step__times";
+        times.forEach((txt) => { const t = document.createElement("span"); t.className = "delivery-step__time asg-data"; t.textContent = txt; box.append(t); });
+        li.append(box);
+      }
       return li;
     }));
   }
@@ -130,7 +136,7 @@
     if (typeof IntersectionObserver !== "function") {
       root.dataset.pastHero = "true";
       draw.forEach((el) => el.classList.add("is-drawn"));
-      document.querySelectorAll(".delivery, .commercial--v2, .marque").forEach((el) => el.classList.add("is-drawn"));
+      document.querySelectorAll(".delivery, .commercial--v2, .marque").forEach((el) => el.classList.add("is-drawn", "is-in"));
       return;
     }
     if (hero) new IntersectionObserver(([e]) => { root.dataset.pastHero = String(!e.isIntersecting); }, { rootMargin: "-120px 0px 0px 0px" }).observe(hero);
@@ -144,6 +150,11 @@
       bandIo.unobserve(e.target);
     }), { rootMargin: "0px 0px -35% 0px" });
     bands.forEach((el) => bandIo.observe(el));
+    const marque = byId("marque");
+    if (marque) {
+      const inIo = new IntersectionObserver(([e]) => { if (e.isIntersecting) { marque.classList.add("is-in"); inIo.disconnect(); } }, { threshold: 0.15 });
+      inIo.observe(marque);
+    }
   }
 
   // A hero title line is atomic: each authored line stays on one row, so a designation
@@ -211,6 +222,7 @@
     setupMotion();
     setupShimmer();
     setupMarque(offer);
+    setupBack(offer);
     setupSpecTools(offer);
     setupGallerySource(offer);
     setupLensFacts();
@@ -226,6 +238,15 @@
     };
     sync();
     new MutationObserver(sync).observe(ul, { childList: true });
+  }
+
+  // "All vehicles": catalogUrl (default "/"); false hides it, e.g. on personalised client links.
+  function setupBack(offer) {
+    const a = byId("catalogBack");
+    if (!a) return;
+    const url = offer.catalogUrl;
+    if (url === false) { a.remove(); return; }
+    if (typeof url === "string" && /^(\/|https:\/\/)[^\s"'<>]*$/.test(url)) a.href = url;
   }
 
   function setupMarque(offer) {

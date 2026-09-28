@@ -1,7 +1,7 @@
 window.ASG_OFFERS = {"rolls-royce-phantom-extended-lhd-2026":{
   "fx": {"amount":544950,"base":"GBP","show":["EUR","USD","AED","CHF"],"ratesUrl":"/rates.json"},
   "prices": [{"currency":"GBP","price":"544,950 GBP"},{"currency":"EUR","price":"635,251 EUR","note":"Indicative at the ECB rate of 28 Sept 2026: 1 GBP = 1.1657 EUR. The contract is settled in GBP."},{"currency":"USD","price":"722,788 USD","note":"Indicative at the ECB rate of 28 Sept 2026: 1 GBP = 1.3263 USD. The contract is settled in GBP."},{"currency":"AED","price":"2,654,459 AED","note":"Indicative at the ECB rate of 28 Sept 2026: 1 GBP = 4.8710 AED. The contract is settled in GBP."},{"currency":"CHF","price":"601,201 CHF","note":"Indicative at the ECB rate of 28 Sept 2026: 1 GBP = 1.1032 CHF. The contract is settled in GBP."}],
-  "deliveryTimeline": [{"title":"Availability & Confirmation","duration":"same day / 1 day"},{"title":"Buyer Details & Contract","duration":"1 – 2 days"},{"title":"Payment & Release","duration":"up to 2 days"},{"title":"Collection or Delivery","duration":"EU: 2 – 7 days; international: route dependent"},{"title":"Arrival & Handover","duration":"on arrival"}],
+  "deliveryTimeline": [{"title":"Availability & Confirmation","duration":"same day / 1 day"},{"title":"Buyer Details & Contract","duration":"1 – 2 days"},{"title":"Payment & Release","duration":"up to 2 days"},{"title":"Collection or Delivery","duration":["EU: 2 – 7 days","International: route dependent"]},{"title":"Arrival & Handover","duration":"on arrival"}],
 "slug":"rolls-royce-phantom-extended-lhd-2026",
 "reference":"ASG-OFFER-RR-PHX-2026",
 "evidenceMode":"actual",

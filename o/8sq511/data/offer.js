@@ -6,7 +6,7 @@ window.ASG_OFFERS = {
   "porsche-911-turbo-s-cabriolet": {
   "fx": {"amount":253621,"base":"EUR","show":["USD","GBP","AED","CHF"],"ratesUrl":"/rates.json"},
   "prices": [{"currency":"EUR","price":"253,621 EUR"},{"currency":"USD","price":"288,570 USD","note":"Indicative at the ECB rate of 28 Sept 2026: 1 EUR = 1.1378 USD. The contract is settled in EUR."},{"currency":"GBP","price":"217,569 GBP","note":"Indicative at the ECB rate of 28 Sept 2026: 1 EUR = 0.8579 GBP. The contract is settled in EUR."},{"currency":"AED","price":"1,059,781 AED","note":"Indicative at the ECB rate of 28 Sept 2026: 1 EUR = 4.1786 AED. The contract is settled in EUR."},{"currency":"CHF","price":"240,027 CHF","note":"Indicative at the ECB rate of 28 Sept 2026: 1 EUR = 0.9464 CHF. The contract is settled in EUR."}],
-  "deliveryTimeline": [{"title":"Availability & Confirmation","duration":"same day / 1 day"},{"title":"Buyer Details & Contract","duration":"1 – 2 days"},{"title":"Payment & Release","duration":"up to 2 days"},{"title":"Collection or Delivery","duration":"EU: 2 – 7 days; international: route dependent"},{"title":"Arrival & Handover","duration":"on arrival"}],
+  "deliveryTimeline": [{"title":"Availability & Confirmation","duration":"same day / 1 day"},{"title":"Buyer Details & Contract","duration":"1 – 2 days"},{"title":"Payment & Release","duration":"up to 2 days"},{"title":"Collection or Delivery","duration":["EU: 2 – 7 days","International: route dependent"]},{"title":"Arrival & Handover","duration":"on arrival"}],
   "marque": {"make":"Porsche","model":"911 Turbo S Cabriolet"},
     slug: "porsche-911-turbo-s-cabriolet",
     reference: "ASG-OFFER-9TSC-260802",

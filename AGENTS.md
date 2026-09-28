@@ -401,3 +401,18 @@ to be confirmed» на карточке не выводится (он и так 
 карточку `data-order/amount/currency/eur` — контракт в `templates/catalog/README.md`.
 Правки в `catalog.css`/`catalog.js`/`enquiry.css` сделаны по брифу `CATALOG.md`
 дизайн-системы — это их выдача, а не наши самодеятельные правки.
+
+### 2026-09-28 — Claude (дельта v2.2)
+По `PROMPT-UPDATE.txt` дизайн-системы применена только дельта v2.2, миграция
+не переделывалась. Во всех 12 офферах поменялось ровно четыре файла:
+- `index.html` — вставлена одна строка `<a class="topbar__back" id="catalogBack" href="/">`
+  первым пунктом `topbar__nav` («← All vehicles»). Мета/OG каждого оффера
+  не тронуты. Скрыть ссылку на персональном оффере: `catalogUrl: false`
+  в `data/offer.js`;
+- `offer-v2.css`, `offer-v2.js` — из шаблона v2.2 как есть;
+- `data/offer.js` — у шага 04 `duration` стал массивом
+  `["EU: 2 – 7 days", "International: route dependent"]`.
+
+**Не сделано — пункт 9 (`body` у шагов доставки):** инструкция отсылает к
+текстам «exactly as in TEMPLATE-README.md», но в README (и во всём пакете)
+этих текстов нет. Сами не сочиняем — ждём тексты от дизайн-системы.
