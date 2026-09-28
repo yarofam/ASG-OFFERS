@@ -1,0 +1,31 @@
+name: FX reference rates
+# Writes /rates.json once per ECB business day. Offers read it for indicative conversion only.
+on:
+  schedule:
+    - cron: "30 15 * * 1-5"   # after the ECB publishes (~16:00 CET)
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  rates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch ECB rates
+        run: |
+          set -euo pipefail
+          curl -fsS "https://api.frankfurter.dev/v1/latest?base=EUR&symbols=USD,GBP,CHF" -o ecb.json
+          node -e '
+            const e = require("./ecb.json");
+            if (!e.rates || !e.rates.USD) throw new Error("no rates");
+            const AED_PER_USD = 3.6725; // UAE dirham peg
+            const out = { base: "EUR", date: e.date, source: "ECB", rates: { ...e.rates, AED: +(e.rates.USD * AED_PER_USD).toFixed(4) } };
+            require("fs").writeFileSync("rates.json", JSON.stringify(out, null, 1) + "\n");
+          '
+          rm ecb.json
+      - name: Commit if changed
+        run: |
+          git config user.name "asg-bot"
+          git config user.email "asg-bot@users.noreply.github.com"
+          git add rates.json
+          git diff --cached --quiet || git commit -m "FX rates $(date -u +%F)" && git push
