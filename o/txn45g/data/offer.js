@@ -1,5 +1,8 @@
 window.ASG_OFFERS = {
  "rolls-royce-cullinan-series-ii-black-badge": {
+  "fx": {"amount":436800,"base":"GBP","show":["EUR","USD","AED","CHF"],"ratesUrl":"/rates.json"},
+  "prices": [{"currency":"GBP","price":"436,800 GBP"},{"currency":"EUR","price":"509,180 EUR","note":"Indicative at the ECB rate of 28 Sept 2026: 1 GBP = 1.1657 EUR. The contract is settled in GBP."},{"currency":"USD","price":"579,345 USD","note":"Indicative at the ECB rate of 28 Sept 2026: 1 GBP = 1.3263 USD. The contract is settled in GBP."},{"currency":"AED","price":"2,127,659 AED","note":"Indicative at the ECB rate of 28 Sept 2026: 1 GBP = 4.8710 AED. The contract is settled in GBP."},{"currency":"CHF","price":"481,888 CHF","note":"Indicative at the ECB rate of 28 Sept 2026: 1 GBP = 1.1032 CHF. The contract is settled in GBP."}],
+  "deliveryTimeline": [{"title":"Availability & Confirmation","duration":"same day / 1 day"},{"title":"Buyer Details & Contract","duration":"1 – 2 days"},{"title":"Payment & Release","duration":"up to 2 days"},{"title":"Collection or Delivery","duration":"EU: 2 – 7 days; international: route dependent"},{"title":"Arrival & Handover","duration":"on arrival"}],
   "slug": "rolls-royce-cullinan-series-ii-black-badge",
   "reference": "ASG-OFFER-7C41E0A9D2B6",
   "evidenceMode": "configuration",

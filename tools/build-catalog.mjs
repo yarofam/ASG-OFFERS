@@ -135,8 +135,34 @@ function parsePrice(raw) {
     const symbol = Object.keys(SYMBOLS).find((key) => text.includes(key));
     currency = symbol ? SYMBOLS[symbol] : "";
   }
-  return `${amount[0].trim()}${currency ? ` ${currency}` : ""}`;
+  const digits = amount[0].trim();
+  /* A number is only exposed for sorting and conversion when it reads without
+     doubt: grouped with commas, no decimals. Anything else still shows as
+     written, it just sorts after the priced cards. */
+  const value = /^\d{1,3}(,\d{3})+$|^\d+$/.test(digits) ? Number(digits.replace(/,/g, "")) : null;
+  return { label: `${digits}${currency ? ` ${currency}` : ""}`, value, currency };
 }
+
+/* Today's ECB file, written by fx-rates.yml. Used only to put one EUR figure
+   on each card so "Price ↑/↓" can order mixed currencies even when the
+   browser cannot load the live file. */
+function readRates() {
+  try {
+    const data = JSON.parse(readFileSync(join(ROOT, "rates.json"), "utf8"));
+    return data && data.base === "EUR" && data.rates ? data : null;
+  } catch {
+    return null;
+  }
+}
+
+function toEur(price, rates) {
+  if (!price || price.value == null || !price.currency || !rates) return null;
+  const perEur = price.currency === "EUR" ? 1 : Number(rates.rates[price.currency]);
+  return perEur > 0 ? Math.round(price.value / perEur) : null;
+}
+
+/* The default status says nothing the footer does not already say. */
+const DEFAULT_STATUS = /^availability to be confirmed\.?$/i;
 
 /* Newest offer first: the catalogue is a stock list, so what arrived last is
    what brokers want to see first. Needs full history (fetch-depth: 0); with a
@@ -292,7 +318,7 @@ function copyIcon(template) {
   return icon ? icon[1] : "";
 }
 
-function renderCards(offers, icon) {
+function renderCards(offers, icon, rates) {
   return offers.map((offer, index) => {
     const name = `${offer.brand} ${offer.model}`.trim();
     const href = `o/${offer.slug}/`;
@@ -300,11 +326,21 @@ function renderCards(offers, icon) {
       ? `<img class="card__photo" src="${esc(offer.photo)}" alt="${esc(name)}" width="${PHOTO.width}" height="${PHOTO.height}" loading="lazy" decoding="async">`
       : "";
     const price = offer.price
-      ? `<p class="card__price asg-data"><span>Net</span><strong>${esc(offer.price)}</strong></p>`
+      ? `<p class="card__price asg-data"><span>Net</span><strong>${esc(offer.price.label)}</strong></p>`
       : `<p class="card__price card__price--request"><span>Net</span><strong>On request</strong></p>`;
-    const status = offer.status ? `\n<p class="card__status">${esc(offer.status)}</p>` : "";
+    const status = offer.status && !DEFAULT_STATUS.test(offer.status)
+      ? `\n<p class="card__status" title="${esc(offer.status)}">${esc(offer.status)}</p>`
+      : "";
+    /* Sort and currency controls read these; "Newest" is the order written here. */
+    const eur = toEur(offer.price, rates);
+    const data = [
+      `data-brand="${esc(offer.brand)}"`,
+      `data-order="${index + 1}"`,
+      offer.price && offer.price.value != null && offer.price.currency ? `data-amount="${offer.price.value}" data-currency="${esc(offer.price.currency)}"` : "",
+      eur != null ? `data-eur="${eur}"` : ""
+    ].filter(Boolean).join(" ");
 
-    return `<article class="card" data-brand="${esc(offer.brand)}">
+    return `<article class="card" ${data}>
 <div class="card__frame">
 ${photo}
 <span class="card__index asg-data" aria-hidden="true">${pad(index + 1)}</span>
@@ -314,10 +350,10 @@ ${photo}
 <div class="card__body">
 <p class="card__brand">${esc(offer.brand)}</p>
 <h3 class="card__model"><a class="card__link" href="${esc(href)}">${esc(offer.model)}</a></h3>
-${offer.spec ? `<p class="card__spec">${esc(offer.spec)}</p>` : ""}
+${offer.spec ? `<p class="card__spec">${esc(offer.spec)}</p>` : ""}${status}
 </div>
 <div class="card__foot">
-${price}${status}
+${price}
 </div>
 </article>`;
   }).join("\n");
@@ -346,7 +382,7 @@ const updated = new Intl.DateTimeFormat("en-GB", {
 
 const template = readFileSync(TEMPLATE, "utf8");
 let page = replaceBlock(template, "FILTERS", renderFilters(offers));
-page = replaceBlock(page, "CARDS", renderCards(offers, copyIcon(template)));
+page = replaceBlock(page, "CARDS", renderCards(offers, copyIcon(template), readRates()));
 page = page.replace(/\{\{COUNT\}\}/g, pad(offers.length)).replace(/\{\{UPDATED\}\}/g, updated);
 
 writeFileSync(join(ROOT, "index.html"), page);

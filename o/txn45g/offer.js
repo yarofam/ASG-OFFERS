@@ -657,7 +657,6 @@
     setText("heroEyebrow", offer.commercialStatus || "Private offer");
     byId("heroEyebrow").hidden = true;
     byId("offerTitle").innerHTML = offer.titleLines.map((line) => `<span>${escapeHTML(line)}</span>`).join("");
-    fitHeroTitle();
     setText("offerSubtitle", offer.subtitle);
     setText("priceLabel", offer.priceLabel);
     renderPrice("priceValue", offer.price);
@@ -978,25 +977,4 @@
   updateContactMode();
   updateTopic();
   renderOffer(resolveKey(), false).catch(showFailure);
-
-  // A hero title line is atomic. Each authored line stays on one row, so a model
-  // designation can never drop its numeral ("Series II" -> "II") onto its own line.
-  // The display size steps down until the longest line fits the hero measure.
-  function fitHeroTitle() {
-    const h1 = byId("offerTitle");
-    if (!h1) return;
-    const fit = () => {
-      h1.style.fontSize = "";
-      const ceiling = parseFloat(getComputedStyle(h1).fontSize);
-      const available = h1.clientWidth;
-      let widest = 0;
-      h1.querySelectorAll("span").forEach((span) => { widest = Math.max(widest, span.scrollWidth); });
-      if (!ceiling || !available || !widest || widest <= available) return;
-      h1.style.fontSize = Math.max(34, Math.floor(ceiling * (available / widest))) + "px";
-    };
-    fit();
-    window.addEventListener("resize", fit);
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
-  }
-
 })();

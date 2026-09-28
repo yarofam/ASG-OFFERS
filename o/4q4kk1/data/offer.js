@@ -1,5 +1,8 @@
 window.ASG_OFFERS = {
  "lamborghini-revuelto": {
+  "fx": {"amount":572250,"base":"EUR","show":["USD","GBP","AED","CHF"],"ratesUrl":"/rates.json"},
+  "prices": [{"currency":"EUR","price":"572,250 EUR"},{"currency":"USD","price":"651,106 USD","note":"Indicative at the ECB rate of 28 Sept 2026: 1 EUR = 1.1378 USD. The contract is settled in EUR."},{"currency":"GBP","price":"490,905 GBP","note":"Indicative at the ECB rate of 28 Sept 2026: 1 EUR = 0.8579 GBP. The contract is settled in EUR."},{"currency":"AED","price":"2,391,204 AED","note":"Indicative at the ECB rate of 28 Sept 2026: 1 EUR = 4.1786 AED. The contract is settled in EUR."},{"currency":"CHF","price":"541,577 CHF","note":"Indicative at the ECB rate of 28 Sept 2026: 1 EUR = 0.9464 CHF. The contract is settled in EUR."}],
+  "deliveryTimeline": [{"title":"Availability & Confirmation","duration":"same day / 1 day"},{"title":"Buyer Details & Contract","duration":"1 – 2 days"},{"title":"Payment & Release","duration":"up to 2 days"},{"title":"Collection or Delivery","duration":"EU: 2 – 7 days; international: route dependent"},{"title":"Arrival & Handover","duration":"on arrival"}],
   "slug": "lamborghini-revuelto",
   "reference": "ASG-OFFER-7B41C9E2D6A0",
   "evidenceMode": "actual",

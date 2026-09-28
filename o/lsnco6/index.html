@@ -10,7 +10,7 @@
   <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <!-- Link preview (WhatsApp/Telegram/iMessage). Crawlers do not run JS, so these are
-       filled per offer at assembly time. https://offers.asg-hub.com/o/1hgi06 = absolute offer URL, no trailing slash. -->
+       filled per offer at assembly time. {{OFFER_URL}} = absolute offer URL, no trailing slash. -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="ASG — Automotive Supply Group">
   <meta property="og:title" content="Porsche Taycan Turbo GT with Weissach Package — ASG Private Offer">
@@ -24,7 +24,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://offers.asg-hub.com/o/lsnco6/share.jpg">
   <link rel="stylesheet" href="offer.css">
-<meta name="robots" content="noindex, noarchive"><meta name="referrer" content="no-referrer"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src https://api.web3forms.com; form-action 'none'; base-uri 'none'; frame-src 'self'"><link rel="stylesheet" href="brand-interaction.css"></head>
+<meta name="robots" content="noindex, noarchive"><meta name="referrer" content="no-referrer"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://api.web3forms.com; form-action 'none'; base-uri 'none'; frame-src 'self'"><link rel="stylesheet" href="brand-interaction.css"><link rel="stylesheet" href="offer-v2.css"></head>
 <body>
   <a class="skip-link" href="#main">Skip to offer</a>
 
@@ -51,6 +51,7 @@
       <a href="#gallery">Gallery</a>
       <a href="#specification">Specification</a>
     </nav>
+    <div class="topbar__progress" aria-hidden="true"><i id="readProgress"></i></div>
   </header>
 
   <main id="main">
@@ -72,6 +73,7 @@
           <span id="priceLabel"></span>
           <strong id="priceValue"></strong>
           <small id="priceNote"></small>
+          <div class="currency-switch currency-switch--dark" data-currency-switch role="group" aria-label="Show price in" hidden></div>
         </div>
         <div class="action-cluster">
         <button class="button button--primary" type="button" data-request-trigger>Contact the ASG team <span aria-hidden="true">↗</span></button>
@@ -82,7 +84,7 @@
 
     <section class="evidence-banner evidence-dashboard" id="overview">
       <div class="evidence-dashboard__inner">
-        <div class="evidence-banner__index">01 / Overview</div>
+        <div class="evidence-banner__index section__rail"><span>01</span><b>Overview</b></div>
         <div class="evidence-dashboard__statement">
           <div class="evidence-chip" id="evidenceBannerChip"><i aria-hidden="true"></i><span>Vehicle offer</span></div>
           <h2 id="evidenceBannerTitle"></h2>
@@ -169,28 +171,46 @@
       <section class="spec-prototype" id="specPrototype" aria-labelledby="specPrototypeTitle"></section>
       <section class="specification-highlights" id="specificationHighlights" aria-label="Selected equipment by contribution" hidden></section>
       <div class="specification__full-label"><span>Vehicle specification.</span><b>Equipment listed in the vehicle specification.</b></div>
+      <div class="spec-tools" id="specTools" hidden><label class="spec-tools__search"><input id="specSearch" type="search" placeholder="Search — seats, wheels, carbon…" aria-label="Search the specification" autocomplete="off" spellcheck="false"></label><div class="spec-tools__meta"><span class="spec-tools__count asg-data" id="specCount" role="status" aria-live="polite"></span><button class="spec-tools__toggle" id="specExpand" type="button">Expand all</button></div></div>
       <div class="specification__groups" id="specGroups"></div>
     </section>
 
-    <section class="commercial section section--signature" aria-labelledby="commercialTitle">
+    <section class="marque" id="marque" aria-hidden="true" hidden>
+      <div class="marque__make" id="marqueMake"></div>
+      <div class="marque__rule"><i></i></div>
+      <div class="marque__foot"><span>ASG · Private offer</span><b id="marqueModel"></b></div>
+    </section>
+
+    <section class="commercial commercial--v2 section section--signature" id="offer" aria-labelledby="commercialTitle">
       <div class="section__rail"><span>05</span><b>Offer details</b></div>
-      <div class="commercial__copy">
+      <div class="commercial__head">
         <p class="eyebrow eyebrow--signature">PURCHASE TERMS</p>
         <h2 id="commercialTitle">Vehicle price before destination costs.</h2>
-        <div class="commercial__panel">
-          <div class="commercial__price asg-data"><span id="commercialPriceLabel"></span><strong id="commercialPrice"></strong></div>
-          <dl class="commercial__terms" id="commercialTerms" hidden></dl>
-        </div>
-        <p id="commercialNote"></p>
       </div>
-      <div class="commercial__readiness">
-        <h3>What ASG handles next</h3>
-        <ul id="readinessList"></ul>
+      <div class="commercial__switch"><div class="currency-switch" data-currency-switch role="group" aria-label="Show price in" hidden></div></div>
+      <div class="commercial__price commercial__figure asg-data"><span id="commercialPriceLabel"></span><strong id="commercialPrice"></strong></div>
+      <div class="commercial__rule" aria-hidden="true"><i></i></div>
+      <dl class="commercial__terms" id="commercialTerms" hidden></dl>
+      <div class="commercial__foot">
+        <div class="commercial__notes"><p id="commercialNote"></p><p class="commercial__currency-note" id="commercialCurrencyNote" hidden></p></div>
+        <button class="button button--primary commercial__cta" type="button" data-request-trigger>Discuss this offer <span aria-hidden="true">↗</span></button>
       </div>
+      <div class="commercial__readiness" hidden><h3>What ASG handles next</h3><ul id="readinessList"></ul></div>
+    </section>
+
+    <section class="delivery section" id="delivery" aria-labelledby="deliveryTitle" hidden>
+      <div class="section__rail"><span>06</span><b>Delivery path</b></div>
+      <div class="delivery__head">
+        <p class="eyebrow eyebrow--light">FROM ORDER TO HANDOVER</p>
+        <h2 id="deliveryTitle"></h2>
+        <p class="lead" id="deliveryIntro"></p>
+      </div>
+      <ol class="delivery__track" id="deliveryTrack"></ol>
+      <p class="delivery__note">Indicative timing · confirmed per vehicle and destination</p>
     </section>
 
     <section class="decision section section--dark" id="decision" aria-labelledby="decisionTitle">
-      <div class="section__rail section__rail--dark"><span>06</span><b>Contact</b></div>
+      <div class="section__rail section__rail--dark"><span id="decisionIndex">06</span><b>Contact</b></div>
       <div class="decision__copy">
         <p class="eyebrow" id="serviceEyebrow">ASG PRIVATE CLIENT SERVICE</p>
         <h2 id="decisionTitle">Contact the ASG team.</h2>
@@ -202,6 +222,8 @@
     </section>
 
   </main>
+
+  <div class="deal-dock" id="dealDock"><div class="deal-dock__price"><span>Net</span><b class="asg-data" id="dockPrice"></b></div><button class="button button--primary deal-dock__cta topbar__contact" type="button" data-request-trigger>Contact ASG</button></div>
 
   <footer class="footer">
     <a class="footer__brand" href="#top" aria-label="ASG — Automotive Supply Group. Back to top"><svg xmlns="http://www.w3.org/2000/svg" width="1028" height="360" viewBox="0 0 514 180" class="brand-lockup" aria-hidden="true" focusable="false">
@@ -269,5 +291,6 @@
   <script src="data/offer.js"></script>
   <script src="asg-transport.js"></script>
   <script src="offer.js"></script>
+  <script src="offer-v2.js"></script>
 </body>
 </html>
