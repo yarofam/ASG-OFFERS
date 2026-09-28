@@ -7,24 +7,24 @@
 <meta name="color-scheme" content="dark">
 <meta name="robots" content="noindex, noarchive">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src https://api.web3forms.com; form-action 'none'; base-uri 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://api.web3forms.com; form-action 'none'; base-uri 'none'">
 <title>Current vehicles — ASG</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<!-- Link preview. Crawlers do not run JS: https://offers.asg-hub.com = absolute site root, no trailing slash. -->
+<!-- Link preview. Crawlers do not run JS: {{SITE_URL}} = absolute site root, no trailing slash. -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="ASG — Automotive Supply Group">
 <meta property="og:title" content="Current vehicles — ASG">
 <meta property="og:description" content="Specified, individually documented vehicles offered through ASG.">
-<meta property="og:url" content="https://offers.asg-hub.com/">
-<meta property="og:image" content="https://offers.asg-hub.com/share.jpg">
+<meta property="og:url" content="{{SITE_URL}}/">
+<meta property="og:image" content="{{SITE_URL}}/share.jpg">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="ASG — current vehicles">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://offers.asg-hub.com/share.jpg">
+<meta name="twitter:image" content="{{SITE_URL}}/share.jpg">
 <link rel="stylesheet" href="catalog.css">
 <link rel="stylesheet" href="brand-interaction.css">
 <link rel="stylesheet" href="enquiry.css">
@@ -45,7 +45,7 @@
 <h1>Current vehicles</h1>
 <p class="masthead__intro">Every car below is a specified, individually documented vehicle offered through ASG. Open a vehicle for its full specification, evidence and commercial terms.</p>
 </div>
-<i class="signal-rule" aria-hidden="true"></i>
+<i class="signal-rule coachline" aria-hidden="true"></i>
 </section>
 
 <div class="filterbar">
@@ -61,13 +61,18 @@
 <button class="chip" type="button" data-filter="Rolls-Royce">Rolls-Royce</button>
 <!-- ASG:FILTERS:END -->
 </div>
-<p class="filterbar__count asg-data" id="resultCount" aria-live="polite"></p>
+<div class="controls">
+<label class="control"><span>Sort</span><select id="sortSelect" aria-label="Sort vehicles"><option value="newest">Newest</option><option value="price-asc">Price ↑</option><option value="price-desc">Price ↓</option></select></label>
+<label class="control" id="currencyControl" hidden><span>Currency</span><select id="currencySelect" aria-label="Show prices in"><option value="">As listed</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="AED">AED</option></select></label>
 </div>
+<p class="visually-hidden" id="resultCount" aria-live="polite"></p>
+</div>
+<p class="fx-note" id="fxNote" hidden></p>
 </div>
 
 <div class="grid" id="grid">
 <!-- ASG:CARDS:START -->
-<article class="card" data-brand="Range Rover">
+<article class="card" data-brand="Range Rover" data-order="1" data-amount="219345" data-currency="EUR" data-eur="219345">
 <div class="card__frame">
 <img class="card__photo" src="assets/media/lr319s.webp" alt="Range Rover P615 SV SWB" width="900" height="563" loading="lazy" decoding="async">
 <span class="card__index asg-data" aria-hidden="true">01</span>
@@ -81,10 +86,9 @@
 </div>
 <div class="card__foot">
 <p class="card__price asg-data"><span>Net</span><strong>219,345 EUR</strong></p>
-<p class="card__status">Availability to be confirmed</p>
 </div>
 </article>
-<article class="card" data-brand="Lamborghini">
+<article class="card" data-brand="Lamborghini" data-order="2" data-amount="488250" data-currency="EUR" data-eur="488250">
 <div class="card__frame">
 <img class="card__photo" src="assets/media/uagrtr.webp" alt="Lamborghini Revuelto" width="900" height="563" loading="lazy" decoding="async">
 <span class="card__index asg-data" aria-hidden="true">02</span>
@@ -98,10 +102,9 @@
 </div>
 <div class="card__foot">
 <p class="card__price asg-data"><span>Net</span><strong>488,250 EUR</strong></p>
-<p class="card__status">Availability to be confirmed</p>
 </div>
 </article>
-<article class="card" data-brand="Rolls-Royce">
+<article class="card" data-brand="Rolls-Royce" data-order="3" data-amount="532854" data-currency="GBP" data-eur="621151">
 <div class="card__frame">
 <img class="card__photo" src="assets/media/zp9ie3.webp" alt="Rolls-Royce Phantom Extended" width="900" height="563" loading="lazy" decoding="async">
 <span class="card__index asg-data" aria-hidden="true">03</span>
@@ -115,10 +118,9 @@
 </div>
 <div class="card__foot">
 <p class="card__price asg-data"><span>Net</span><strong>532,854 GBP</strong></p>
-<p class="card__status">Availability to be confirmed</p>
 </div>
 </article>
-<article class="card" data-brand="Rolls-Royce">
+<article class="card" data-brand="Rolls-Royce" data-order="4" data-amount="544950" data-currency="GBP" data-eur="635251">
 <div class="card__frame">
 <img class="card__photo" src="assets/media/2fex4s.webp" alt="Rolls-Royce Phantom Extended" width="900" height="563" loading="lazy" decoding="async">
 <span class="card__index asg-data" aria-hidden="true">04</span>
@@ -129,13 +131,13 @@
 <p class="card__brand">Rolls-Royce</p>
 <h3 class="card__model"><a class="card__link" href="o/2fex4s/">Phantom Extended</a></h3>
 <p class="card__spec">Black Diamond · Silver Satin bonnet · Mandarin interior · LHD · MY 2026</p>
+<p class="card__status" title="United Kingdom · EXW">United Kingdom · EXW</p>
 </div>
 <div class="card__foot">
 <p class="card__price asg-data"><span>Net</span><strong>544,950 GBP</strong></p>
-<p class="card__status">United Kingdom · EXW</p>
 </div>
 </article>
-<article class="card" data-brand="Range Rover">
+<article class="card" data-brand="Range Rover" data-order="5" data-amount="253575" data-currency="EUR" data-eur="253575">
 <div class="card__frame">
 <img class="card__photo" src="assets/media/1cgfag.webp" alt="Range Rover P615 SV LWB" width="900" height="563" loading="lazy" decoding="async">
 <span class="card__index asg-data" aria-hidden="true">05</span>
@@ -149,10 +151,9 @@
 </div>
 <div class="card__foot">
 <p class="card__price asg-data"><span>Net</span><strong>253,575 EUR</strong></p>
-<p class="card__status">Availability to be confirmed</p>
 </div>
 </article>
-<article class="card" data-brand="Rolls-Royce">
+<article class="card" data-brand="Rolls-Royce" data-order="6" data-amount="436800" data-currency="GBP" data-eur="509180">
 <div class="card__frame">
 <img class="card__photo" src="assets/media/txn45g.webp" alt="Rolls-Royce Cullinan Series II Black Badge" width="900" height="563" loading="lazy" decoding="async">
 <span class="card__index asg-data" aria-hidden="true">06</span>
@@ -163,13 +164,13 @@
 <p class="card__brand">Rolls-Royce</p>
 <h3 class="card__model"><a class="card__link" href="o/txn45g/">Cullinan Series II Black Badge</a></h3>
 <p class="card__spec">Black Diamond · Mandarin · Left-hand drive</p>
+<p class="card__status" title="Production November 2026">Production November 2026</p>
 </div>
 <div class="card__foot">
 <p class="card__price asg-data"><span>Net</span><strong>436,800 GBP</strong></p>
-<p class="card__status">Production November 2026</p>
 </div>
 </article>
-<article class="card" data-brand="Rolls-Royce">
+<article class="card" data-brand="Rolls-Royce" data-order="7" data-amount="444043" data-currency="GBP" data-eur="517623">
 <div class="card__frame">
 <img class="card__photo" src="assets/media/n67n9t.webp" alt="Rolls-Royce Black Badge Cullinan Series II" width="900" height="563" loading="lazy" decoding="async">
 <span class="card__index asg-data" aria-hidden="true">07</span>
@@ -180,13 +181,13 @@
 <p class="card__brand">Rolls-Royce</p>
 <h3 class="card__model"><a class="card__link" href="o/n67n9t/">Black Badge Cullinan Series II</a></h3>
 <p class="card__spec">Lyrical Copper · Silver Satin bonnet · Mandarin hide · Left-hand drive · 2027 model year</p>
+<p class="card__status" title="Production November 2026">Production November 2026</p>
 </div>
 <div class="card__foot">
 <p class="card__price asg-data"><span>Net</span><strong>444,043 GBP</strong></p>
-<p class="card__status">Production November 2026</p>
 </div>
 </article>
-<article class="card" data-brand="Ferrari">
+<article class="card" data-brand="Ferrari" data-order="8" data-amount="470269" data-currency="EUR" data-eur="470269">
 <div class="card__frame">
 <img class="card__photo" src="assets/media/wbqmga.webp" alt="Ferrari 296 Speciale" width="900" height="563" loading="lazy" decoding="async">
 <span class="card__index asg-data" aria-hidden="true">08</span>
@@ -200,10 +201,9 @@
 </div>
 <div class="card__foot">
 <p class="card__price asg-data"><span>Net</span><strong>470,269 EUR</strong></p>
-<p class="card__status">Availability to be confirmed</p>
 </div>
 </article>
-<article class="card" data-brand="Lamborghini">
+<article class="card" data-brand="Lamborghini" data-order="9" data-amount="572250" data-currency="EUR" data-eur="572250">
 <div class="card__frame">
 <img class="card__photo" src="assets/media/4q4kk1.webp" alt="Lamborghini Revuelto" width="900" height="563" loading="lazy" decoding="async">
 <span class="card__index asg-data" aria-hidden="true">09</span>
@@ -217,10 +217,9 @@
 </div>
 <div class="card__foot">
 <p class="card__price asg-data"><span>Net</span><strong>572,250 EUR</strong></p>
-<p class="card__status">Availability to be confirmed</p>
 </div>
 </article>
-<article class="card" data-brand="Porsche">
+<article class="card" data-brand="Porsche" data-order="10" data-amount="253621" data-currency="EUR" data-eur="253621">
 <div class="card__frame">
 <img class="card__photo" src="assets/media/8sq511.webp" alt="Porsche 911 Turbo S Cabriolet" width="900" height="563" loading="lazy" decoding="async">
 <span class="card__index asg-data" aria-hidden="true">10</span>
@@ -234,10 +233,9 @@
 </div>
 <div class="card__foot">
 <p class="card__price asg-data"><span>Net</span><strong>253,621 EUR</strong></p>
-<p class="card__status">Availability to be confirmed</p>
 </div>
 </article>
-<article class="card" data-brand="Porsche">
+<article class="card" data-brand="Porsche" data-order="11" data-amount="185220" data-currency="EUR" data-eur="185220">
 <div class="card__frame">
 <img class="card__photo" src="assets/media/lsnco6.webp" alt="Porsche Taycan Turbo GT with Weissach Package" width="900" height="563" loading="lazy" decoding="async">
 <span class="card__index asg-data" aria-hidden="true">11</span>
@@ -251,10 +249,9 @@
 </div>
 <div class="card__foot">
 <p class="card__price asg-data"><span>Net</span><strong>185,220 EUR</strong></p>
-<p class="card__status">Availability to be confirmed</p>
 </div>
 </article>
-<article class="card" data-brand="Rolls-Royce">
+<article class="card" data-brand="Rolls-Royce" data-order="12" data-amount="393645" data-currency="GBP" data-eur="458874">
 <div class="card__frame">
 <img class="card__photo" src="assets/media/r2pcke.webp" alt="Rolls-Royce Spectre Series II Silver Badge" width="900" height="563" loading="lazy" decoding="async">
 <span class="card__index asg-data" aria-hidden="true">12</span>
@@ -265,10 +262,10 @@
 <p class="card__brand">Rolls-Royce</p>
 <h3 class="card__model"><a class="card__link" href="o/r2pcke/">Spectre Series II Silver Badge</a></h3>
 <p class="card__spec">Dark Emerald · Black Diamond · Mandarin coachline · Black and Tan hides</p>
+<p class="card__status" title="Build slot · production scheduled November 2026">Build slot · production scheduled November 2026</p>
 </div>
 <div class="card__foot">
 <p class="card__price asg-data"><span>Net</span><strong>393,645 GBP</strong></p>
-<p class="card__status">Build slot · production scheduled November 2026</p>
 </div>
 </article>
 <!-- ASG:CARDS:END -->

@@ -66,6 +66,16 @@ In the topbar, literal, replaced by string substitution:
 
 `data-count` on the chips is **not** the generator's job — `catalog.js` counts the cards it finds and writes it.
 
+**v2 (Sept 2026) — sort and indicative currency.** Each card also carries:
+
+- `data-order="<n>"` — its position as published (newest first); "Newest" sorts by it
+- `data-amount="<integer>"` and `data-currency="<EUR|GBP|…>"` — the contract price as a number, only when it parses without doubt; absent for "On request", which always sorts last
+- `data-eur="<integer>"` — that price in EUR from the repo's `rates.json` at build time, so "Price ↑/↓" can order mixed currencies even when the browser cannot load the live file
+
+The filter bar holds `#sortSelect`, `#currencyControl` (hidden until `/rates.json` loads fresh — 1.5 s timeout, ≤ 10 days old) with `#currencySelect`, and `#fxNote` for the one-line ECB basis. The currency choice is stored under `asg.offer.currency`, the same key the offer pages use. The CSP must keep `connect-src 'self'` for that fetch.
+
+The status line sits under the spec (one line, ellipsis) and is **omitted when it reads "Availability to be confirmed"** — the footer already says availability is reconfirmed. The card foot holds only NET and the price.
+
 ### 4. Card markup
 
 Emit exactly this shape (whitespace free to differ). The card index is written once by the generator and **rewritten by `catalog.js` on every filter change**, so a filtered view always reads 01, 02, 03 — emit the unfiltered number.
@@ -85,10 +95,11 @@ Emit exactly this shape (whitespace free to differ). The card index is written o
 </div>
 <div class="card__foot">
 <p class="card__price asg-data"><span>Net</span><strong>470,269 EUR</strong></p>
-<p class="card__status">Availability to be confirmed</p>
 </div>
 </article>
 ```
+
+(v2: a non-default status goes inside `.card__body`, after the spec: `<p class="card__status" title="…">Production November 2026</p>`.)
 
 Copy the `<svg>` verbatim from any card in `index.html` — it is the only icon on the page.
 
